@@ -7,6 +7,10 @@ int main(void) {
 	GLCD_Init();
 	GLCD_Clear(White);
 	GLCD_DisplayString(0, 0, 1, "Lab1!");
+
+	//doTenMinuteClockWithCustomDelay();
+	//doTenMinuteClockWithTimer();
+
 	return 0;
 }
 
@@ -25,7 +29,6 @@ void customDelay(unsigned int time) {
 	}
 }
 
-
 void doTenMinuteClockWithCustomDelay() {
 	unsigned int minutes = 0;
 	unsigned int seconds = 0;
@@ -36,6 +39,10 @@ void doTenMinuteClockWithCustomDelay() {
 
 	GLCD_Clear(White);
 	GLCD_DisplayString(0, 0, 1, str);
+
+	// Disable all interrupts during the delay
+	// cause by the nested for loops
+	__disable_irq();
 
 	while(minutes != 10) {
 		customDelay(1000);
@@ -50,4 +57,19 @@ void doTenMinuteClockWithCustomDelay() {
 		GLCD_Clear(White);
 		GLCD_DisplayString(0, 0, 1, str);
 	}
+
+	// Enable interrupts again
+	__enable_irq();
+}
+
+void doTenMinuteClockWithTimer() {
+	LPC_TIM0->TCR = 0x02; // Reset Timer
+	LPC_TIM0->TCR = 0x01; // Enable Timer
+	LPC_TIM0->MR0 = 2048; // Match value
+	LPC_TIM0->MCR |= 0x03; // On match, generate interrupt and reset
+	NVIC_EnableIRQ(TIMER0_IRQn); // Allow for interrupts from timer0
+}
+
+void TIMER0_IRQHander() {
+	
 }
