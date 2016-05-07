@@ -26,7 +26,7 @@ void customDelay(unsigned int time) {
 }
 
 
-void doTenMinuteClock() {
+void doTenMinuteClockWithCustomDelay() {
 	unsigned int minutes = 0;
 	unsigned int seconds = 0;
 
