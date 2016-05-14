@@ -18,6 +18,7 @@
 *.l1p
 *.l2p
 *.iex
+*.plg
 .#*
 *.uvgui.*
 *.uvopt
