@@ -48,40 +48,47 @@ void doTenMinuteClockWithCustomDelay() {
 	__enable_irq();
 }
 
-void doTenMinuteClockWithTimer() {
-	unsigned int minutes = 0;
-	unsigned int seconds = 0;
+unsigned int minutes = 0;
+unsigned int seconds = 0;
 
-	char str[6];
+void TIMER0_IRQHandler(void)
+{
+	LPC_TIM0->IR |= 0x01;
+	if (++seconds == 60) {
+		if (++minutes == 10) {
+			LPC_TIM0->TCR = 0x00; // Disable Timer
+			NVIC_DisableIRQ(TIMER0_IRQn); // Disallow for interrupts from Timer0
+		}								
 
-	LPC_TIM0->TCR = 0x02; // Reset Timer
-	LPC_TIM0->TCR = 0x01; // Enable Timer
-	LPC_TIM0->MR0 = 2048; // Match value
-	LPC_TIM0->MCR |= 0x03; // On match, generate interrupt and reset
-	NVIC_EnableIRQ(TIMER0_IRQn); // Allow for interrupts from timer0
-
-	sprintf(str, "%02u:%02u", minutes, seconds);
-
-	GLCD_Clear(White);
-	GLCD_DisplayString(0, 0, 1, str);
-
-	while(minutes != 10) {
-		customDelay(1000);
-
-		if (++seconds == 60) {
-			++minutes;
-			seconds = 0;
-		}
-
-		sprintf(str, "%02u:%02u", minutes, seconds);
-
-		GLCD_Clear(White);
-		GLCD_DisplayString(0, 0, 1, str);
+		seconds = 0;
 	}
 }
 
-void TIMER0_IRQHander() {
-	
+void doTenMinuteClockWithTimer() {
+	char str[6];
+	unsigned int old_minutes = 0;
+	unsigned int old_seconds = 0;
+
+	sprintf(str, "%02u:%02u", minutes, seconds);
+	GLCD_DisplayString(0, 0, 1, str);
+
+	LPC_TIM0->TCR = 0x02; // Reset Timer
+	LPC_TIM0->TCR = 0x01;
+	LPC_TIM0->MR0 = 1000000; // Match value  (M = 100; N = 6; F = 4MHz; CCLKSEL set to 4 so 2 * M * F / (N * CCLKSEL_VALUE) = 33333333)
+	LPC_TIM0->MCR |= 0x03; // On match, generate interrupt and reset
+	NVIC_EnableIRQ(TIMER0_IRQn); // Allow for interrupts from Timer0 
+
+	while(1) {
+		if (old_minutes != minutes	|| old_seconds != seconds) {
+			old_minutes = minutes;
+			old_seconds = seconds;
+
+			sprintf(str, "%02u:%02u", minutes, seconds);
+			GLCD_DisplayString(0, 0, 1, str);
+		} else if (old_minutes == 10) {
+			break;
+		}
+	}
 }
 
 int main(void) {
@@ -90,8 +97,8 @@ int main(void) {
 	GLCD_Clear(White);
 	GLCD_DisplayString(0, 0, 1, "Lab1!");
 
-	doTenMinuteClockWithCustomDelay();
-	//doTenMinuteClockWithTimer();
+	//doTenMinuteClockWithCustomDelay();
+	doTenMinuteClockWithTimer();
 
 	return 0;
 }
