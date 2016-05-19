@@ -3,7 +3,7 @@
 #include "glcd.h"
 
 void customDelay(unsigned int time) {
-	// looping 25000 times seems to create a
+	// looping 24854 times seems to create a
 	// delay of 1 ms, so do that a times to create
 	// a delay of a (in milliseconds).
 
@@ -11,8 +11,8 @@ void customDelay(unsigned int time) {
 	unsigned int b;
 
 	for(a = time; a != 0; --a) {
-		for (b = 25000; b != 0; --b) {
-
+		for (b = 24854; b != 0; --b) {
+			// Do Nothing
 		}
 	}
 }
