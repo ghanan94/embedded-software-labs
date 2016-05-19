@@ -73,8 +73,8 @@ void doTenMinuteClockWithTimer() {
 	GLCD_DisplayString(0, 0, 1, str);
 
 	LPC_TIM0->TCR = 0x02; // Reset Timer
-	LPC_TIM0->TCR = 0x01;
-	LPC_TIM0->MR0 = 1000000; // Match value  (M = 100; N = 6; F = 4MHz; CCLKSEL set to 4 so 2 * M * F / (N * CCLKSEL_VALUE) = 33333333)
+	LPC_TIM0->TCR = 0x01;  // Enable Timer
+	LPC_TIM0->MR0 = 25000000; // Match value  (M = 100; N = 6; F = 4MHz; CCLKSEL set to 4 so 2 * M * F / (N * CCLKSEL_VALUE) = 33333333)
 	LPC_TIM0->MCR |= 0x03; // On match, generate interrupt and reset
 	NVIC_EnableIRQ(TIMER0_IRQn); // Allow for interrupts from Timer0 
 
