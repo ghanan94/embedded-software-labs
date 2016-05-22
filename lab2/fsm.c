@@ -8,9 +8,9 @@
  *
  * PARAMETERS:
  *  struct finite_state_machine *fsm
- *    - Pointer to a finite state machine
+ *    - Pointer to a finite state machine.
  *  int event
- *    - An event that occured
+ *    - An event that occured.
  *
  * RETURNS:
  */

@@ -12,11 +12,11 @@
  *
  * MEMBERS:
  *  int source_state
- *    - State at the start of the transition
+ *    - State at the start of the transition.
  *  int event
- *    - Event that occured when currently at a state
+ *    - Event that occured when currently at a state.
  *  int destination_state
- *    - Resulting state as a result of the event and current state
+ *    - Resulting state as a result of the event and current state.
  */
 struct transition {
   int source_state;
@@ -27,15 +27,15 @@ struct transition {
 /*
  * NAME:          finite_state_machine
  *
- * DESCRIPTION:   A finite state machine's data/information
+ * DESCRIPTION:   A finite state machine's data/information.
  *
  * MEMBERS:
  *  int current_state
- *    - Current state of the finite state machine
+ *    - Current state of the finite state machine.
  *  unsigned int num_transitions
- *    - Total number of possible state transitions
+ *    - Total number of possible state transitions.
  *  struct transition *transitions
- *    - Array of all possible state transitions
+ *    - Array of all possible state transitions.
  */
 struct finite_state_machine {
   int current_state;
@@ -47,13 +47,13 @@ struct finite_state_machine {
  * NAME:          perform_state_transition
  *
  * DESCRIPTION:   Update the finite state machine's current state, given an
- *                event
+ *                event.
  *
  * PARAMETERS:
  *  struct finite_state_machine fsm
- *    - Pointer to a finite state machine
+ *    - Pointer to a finite state machine.
  *  int event
- *    - An event that occured
+ *    - An event that occured.
  *
  * RETURNS:
  *  void
