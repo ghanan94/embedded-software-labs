@@ -13,6 +13,8 @@
  *    - An event that occured.
  *
  * RETURNS:
+ *  int next_state
+ *    - The next state of the finite state machine.
  */
 int next_state(struct finite_state_machine *fsm, int event) {
     unsigned int i = 0;
