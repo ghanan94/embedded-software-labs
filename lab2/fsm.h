@@ -56,7 +56,7 @@ struct finite_state_machine {
  *    - An event that occured.
  *
  * RETURNS:
- *  void
+ *  N/A
  */
 void perform_state_transition(struct finite_state_machine *, int);
 

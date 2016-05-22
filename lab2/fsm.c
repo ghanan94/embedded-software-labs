@@ -30,6 +30,9 @@ int next_state(struct finite_state_machine *fsm, int event) {
     return -1;
 }
 
+/*
+ * See fsm.h for comments.
+ */
 void perform_state_transition(struct finite_state_machine *fsm, int event) {
     int new_state = next_state(fsm, event);
 

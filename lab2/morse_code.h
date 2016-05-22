@@ -5,6 +5,8 @@
 #ifndef _MORSE_CODE_H
 #define _MORSE_CODE_H
 
+#include "fsm.h"
+
 /*
  * NAME:          MORSE_CODE_STATES
  *
@@ -58,5 +60,26 @@ enum MORSE_CODE_EVENTS {
     MORSE_CODE_DOT_EVENT,
     MORSE_CODE_DASH_EVENT
 };
+
+/*
+ * NAME:          morse_code_fsm
+ *
+ * DESCRIPTION:   Pointer to the finite state machine for the Morse code
+ *                pattern specified.
+ */
+extern struct finite_state_machine *morse_code_fsm;
+
+/*
+ * NAME:          init_morse_code_fsm
+ *
+ * DESCRIPTION:   Initializes and sets up the Morse code finite state machine.
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  N/A
+ */
+void init_morse_code_fsm(void);
 
 #endif
