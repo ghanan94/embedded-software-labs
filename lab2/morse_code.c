@@ -1,5 +1,4 @@
 #include "morse_code.h"
-#include "fsm.h"
 #include <stdlib.h>
 #include "glcd.h"
 
