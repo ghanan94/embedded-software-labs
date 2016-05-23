@@ -7,7 +7,7 @@
  *
  * DESCRIPTION:   Time in milliseconds between reading button status.
  */
-#define TIME_BETWEEN_TEMPERATURE_READS_MS 5
+#define TIME_BETWEEN_TEMPERATURE_READS_MS 20
 
 /*
  * NAME:          NUM_POSSIBLE_THERMOSTAT_TRANSITIONS
@@ -25,7 +25,9 @@ struct transition POSSIBLE_THERMOSTAT_TRANSITIONS[] = {
     { THERMOSTAT_IDLE_STATE, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_HOT_EVENT, THERMOSTAT_COOLING_STATE },
     { THERMOSTAT_IDLE_STATE, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_COOL_EVENT, THERMOSTAT_HEATING_STATE },
     { THERMOSTAT_HEATING_STATE, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_HOT_EVENT, THERMOSTAT_COOLING_STATE },
-    { THERMOSTAT_COOLING_STATE, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_COOL_EVENT, THERMOSTAT_HEATING_STATE }
+    { THERMOSTAT_HEATING_STATE, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_OKAY_EVENT, THERMOSTAT_IDLE_STATE },
+    { THERMOSTAT_COOLING_STATE, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_COOL_EVENT, THERMOSTAT_HEATING_STATE },
+    { THERMOSTAT_COOLING_STATE, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_OKAY_EVENT, THERMOSTAT_IDLE_STATE }
 };
 
 /*
@@ -48,6 +50,13 @@ unsigned char HEATING_TEXT[] = "HEATING\0";
  * DESCRIPTION:   The text for COOLING state.
  */
 unsigned char COOLING_TEXT[] = "COOLING\0";
+
+/*
+ * NAME:          set_temperature
+ *
+ * DESCRIPTION:   The temperature the thermostat is set to.
+ */
+int set_temperature;
 
 /*
  * See thermostat.h for comments.
@@ -125,7 +134,18 @@ void TIMER0_IRQHandler(void) {
  *  N/A
  */
 void ADC_IRQHandler(void) {
-    int potentiometer = (LPC_ADC->ADDR2 >> 4) & 0xFFF; // read ADC Result
+    int actual_temperature = (LPC_ADC->ADDR2 >> 4) & 0xFFF; // read ADC Result
+
+    if (actual_temperature > set_temperature) {
+        // TOO HOT
+        perform_state_transition(&thermostat_fsm, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_HOT_EVENT);
+    } else if (actual_temperature < set_temperature) {
+        // TOO COLD
+        perform_state_transition(&thermostat_fsm, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_COOL_EVENT);
+    } else {
+        // OKAY
+        perform_state_transition(&thermostat_fsm, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_OKAY_EVENT);
+    }
 }
 
 /*
@@ -185,6 +205,8 @@ void init_adc(void) {
  * See thermostat.h for comments.
  */
 void init_thermostat(void) {
+    set_temperature = 24;
+
     thermostat_fsm.current_state = THERMOSTAT_IDLE_STATE;
     thermostat_fsm.num_transitions = NUM_POSSIBLE_THERMOSTAT_TRANSITIONS;
     thermostat_fsm.transitions = POSSIBLE_THERMOSTAT_TRANSITIONS;
