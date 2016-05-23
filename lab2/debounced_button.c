@@ -136,10 +136,10 @@ void debounced_button_state_transition(int previous_state, int event, int curren
  *  N/A
  */
 void init_debounced_button_fsm(void) {
-  debounced_button_fsm.current_state = BUTTON_RELEASED_STATE;
-  debounced_button_fsm.num_transitions = NUM_POSSIBLE_BUTTON_TRANSITIONS;
-  debounced_button_fsm.transitions = POSSIBLE_BUTTON_TRANSITIONS;
-  debounced_button_fsm.transition_function = &debounced_button_state_transition;
+    debounced_button_fsm.current_state = BUTTON_RELEASED_STATE;
+    debounced_button_fsm.num_transitions = NUM_POSSIBLE_BUTTON_TRANSITIONS;
+    debounced_button_fsm.transitions = POSSIBLE_BUTTON_TRANSITIONS;
+    debounced_button_fsm.transition_function = &debounced_button_state_transition;
 }
 
 /*

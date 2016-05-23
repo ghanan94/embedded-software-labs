@@ -19,9 +19,9 @@
  *    - Resulting state as a result of the event and current state.
  */
 struct transition {
-  int source_state;
-  int event;
-  int destination_state;
+    int source_state;
+    int event;
+    int destination_state;
 };
 
 /*
@@ -41,10 +41,10 @@ struct transition {
       current_state);
  */
 struct finite_state_machine {
-  int current_state;
-  unsigned int num_transitions;
-  struct transition *transitions;
-  void (*transition_function)(int, int, int);
+    int current_state;
+    unsigned int num_transitions;
+    struct transition *transitions;
+    void (*transition_function)(int, int, int);
 };
 
 /*
