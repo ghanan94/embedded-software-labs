@@ -78,7 +78,7 @@ struct finite_state_machine morse_code_fsm;
  * RETURNS:
  *  N/A
  */
-void turn_on_leds(int left_led_count) {
+void turn_on_leds(unsigned int left_led_count) {
     int i = 0;
     int port_1_set_mask = 0;
     int port_2_set_mask = 0;

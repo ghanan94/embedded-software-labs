@@ -46,6 +46,13 @@
 #define BUTTON_READ_MASK ((1 << NUM_BUTTON_READS) - 1)
 
 /*
+ * NAME:          RIGHTMOST_LED_MASK
+ *
+ * DESCRIPTION:   Mask for the right most led setting and clearing.
+ */
+#define RIGHT_MOST_LED_MASK (1 << 6)
+
+/*
  * NAME:          NUM_POSSIBLE_BUTTON_TRANSITIONS
  *
  * DESCRIPTION:   Total number of button transitions.
@@ -135,6 +142,26 @@ void debounced_button_state_transition(int previous_state, int event, int curren
 }
 
 /*
+ * NAME:          turn_on_led
+ *
+ * DESCRIPTION:   Turns on or off the right most led.
+ *
+ * PARAMETERS:
+ *  unsigned int on_status
+ *    - if on_status > 0, turn on the rightmost led
+ *
+ * RETURNS:
+ *  N/A
+ */
+void turn_on_led(unsigned int on_status) {
+    if (on_status) {
+        LPC_GPIO2->FIOSET = RIGHT_MOST_LED_MASK;
+    } else {
+        LPC_GPIO2->FIOCLR = RIGHT_MOST_LED_MASK;
+    }
+}
+
+/*
  * NAME:          read_debounced_button
  *
  * DESCRIPTION:   Read button status and debounce. Debounce is implemented by
@@ -162,8 +189,26 @@ void read_debounced_button(void) {
     } else if (button_read_masked == 0) {
         // Released
         perform_state_transition(&debounced_button_fsm, BUTTON_RELEASE_EVENT);
+        turn_on_led(0); // Turn led off
     }
 }
+
+/*
+ * NAME:          init_led
+ *
+ * DESCRIPTION:   Initializes and sets up the right most led which will show
+ *                DOT/DASH status.
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  N/A
+ */
+void init_led(void) {
+    // Only init the right most led
+    LPC_GPIO2->FIODIR |= 0x00000040; // LED on PORT2.6;
+ }
 
 /*
  * NAME:          init_timer
@@ -211,8 +256,12 @@ void TIMER0_IRQHandler(void) {
 
     current_time += TIME_BETWEEN_BUTTON_READS_MS;
 
-    read_debounced_button();
+    if ((current_time - last_button_press_time) == DASH_DELAY_THRESHOLD_MS) {
+        // Turn led on to indicate that a DASH will be recognized
+        turn_on_led(1);
+    }
 
+    read_debounced_button();
 }
 
 /*
@@ -245,4 +294,5 @@ void init_debounced_button(void) {
 
     init_debounced_button_fsm();
     init_timer();
+    init_led();
 }
