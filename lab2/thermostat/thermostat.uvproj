@@ -416,6 +416,16 @@
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
             </File>
+            <File>
+              <FileName>thermostat.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\thermostat.c</FilePath>
+            </File>
+            <File>
+              <FileName>thermostat.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\thermostat.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
