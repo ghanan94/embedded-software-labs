@@ -7,7 +7,7 @@
  *
  * DESCRIPTION:   Total number of Morse code pattern transitions.
  */
-int NUM_POSSIBLE_MORSE_CODE_TRANSITIONS = 12;
+#define NUM_POSSIBLE_MORSE_CODE_TRANSITIONS 12
 
 /*
  * NAME:          POSSIBLE_MORSE_CODE_TRANSITIONS

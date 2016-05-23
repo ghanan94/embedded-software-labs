@@ -4,6 +4,13 @@
 #include "morse_code.h"
 
 /*
+ * NAME:          TIME_BETWEEN_BUTTON_READS_MS
+ *
+ * DESCRIPTION:   Time in milliseconds between reading button status.
+ */
+#define TIME_BETWEEN_BUTTON_READS_MS 5
+
+/*
  * NAME:          DASH_DELAY_THRESHOLD_MS
  *
  * DESCRIPTION:   Minimum time in milliseconds between a button press and
@@ -16,7 +23,15 @@
  *
  * DESCRIPTION:   Total number of button transitions.
  */
-int NUM_POSSIBLE_BUTTON_TRANSITIONS = 2;
+#define NUM_POSSIBLE_BUTTON_TRANSITIONS 2
+
+/*
+ * NAME:          NUM_BUTTON_READS
+ *
+ * DESCRIPTION:   Mask for button status. If 5 LSB are all 1 then pressed; if
+ *                5 LSB are all 0 then released; else bouncing. (2^5-1=31=0x1F)
+ */
+#define BUTTON_READ_MASK 0x1F
 
 /*
  * NAME:          POSSIBLE_BUTTON_TRANSITIONS
@@ -48,6 +63,15 @@ unsigned int current_time;
  * DESCRIPTION:   Time of the last button press event.
  */
 unsigned int last_button_press_time;
+
+/*
+ * NAME:          button_reads
+ *
+ * DESCRIPTION:   Array of <NUM_BUTTON_READS> most recent reads of button.
+ *                MSB contains the oldest read; LSB contains newest read.
+ *                (Unsigned Char because only 8 bits is needed).
+ */
+unsigned char button_reads;
 
 /*
  * NAME:          debounced_button_state_transition
@@ -87,6 +111,35 @@ void debounced_button_state_transition(int previous_state, int event, int curren
 }
 
 /*
+ * NAME:          read_debounced_button
+ *
+ * DESCRIPTION:   Read button status and debounce.
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  N/A
+ */
+void read_debounced_button(void) {
+    unsigned char button_read_masked;
+
+    // Read new button status and shift all the previous ones
+    button_reads <<= 1;
+    button_reads |= ~(LPC_GPIO2->FIOPIN >> 10) & 0x01;
+
+    button_read_masked = button_reads & BUTTON_READ_MASK;
+
+    if (button_read_masked == BUTTON_READ_MASK) {
+        // Pressed
+        perform_state_transition(&debounced_button_fsm, BUTTON_PRESS_EVENT);
+    } else if (button_read_masked == 0) {
+        // Released
+        perform_state_transition(&debounced_button_fsm, BUTTON_RELEASE_EVENT);
+    }
+}
+
+/*
  * NAME:          init_timer
  *
  * DESCRIPTION:   Initializes and sets up the timer to tick every 1 ms.
@@ -118,9 +171,12 @@ void debounced_button_state_transition(int previous_state, int event, int curren
   *  N/A
   */
  void TIMER0_IRQHandler(void) {
-     LPC_TIM0->IR |= 0x01; // Clear interrupt request
+    LPC_TIM0->IR |= 0x01; // Clear interrupt request
 
-     ++current_time;
+    if ((++current_time % TIME_BETWEEN_BUTTON_READS_MS) == 0) {
+        // Time has passed since last button read
+        read_debounced_button();
+    }
  }
 
 /*
@@ -148,6 +204,8 @@ void init_debounced_button_fsm(void) {
 void init_debounced_button(void) {
     LPC_PINCON->PINSEL4 &= ~(3 << 20); // P2.10 is GPIO
     LPC_GPIO2->FIODIR &= ~(1 << 10); // P2.10 is input
+
+    button_reads = 0;
 
     init_debounced_button_fsm();
     init_timer();
