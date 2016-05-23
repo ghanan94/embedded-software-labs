@@ -9,7 +9,7 @@
  * DESCRIPTION:   Minimum time in milliseconds between a button press and
  *                button release event for it to be considered a dash.
  */
-int DASH_DELAY_THRESHOLD_MS = 500;
+#define DASH_DELAY_THRESHOLD_MS 500
 
 /*
  * NAME:          NUM_POSSIBLE_BUTTON_TRANSITIONS
