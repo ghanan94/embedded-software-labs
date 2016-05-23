@@ -40,7 +40,8 @@ void perform_state_transition(struct finite_state_machine *fsm, int event) {
     if (new_state == -1) {
         // ERROR. No Transition mapping from the fsm's current state and
         // the specified event.
-        return;
+        //return;
+        new_state = previous_state;
     }
 
     fsm->current_state = new_state;
