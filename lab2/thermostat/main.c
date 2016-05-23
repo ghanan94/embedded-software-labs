@@ -8,7 +8,7 @@ int main(void) {
     GLCD_Clear(White);
     GLCD_DisplayString(0, 0, 1, "Thermostat");
 
-	init_thermostat();
+    init_thermostat();
 
     while(1) {}
 
