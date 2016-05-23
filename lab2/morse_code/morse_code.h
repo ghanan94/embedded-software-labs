@@ -5,7 +5,7 @@
 #ifndef _MORSE_CODE_H
 #define _MORSE_CODE_H
 
-#include "fsm.h"
+#include <fsm/fsm.h>
 
 /*
  * NAME:          MORSE_CODE_STATES
