@@ -13,7 +13,7 @@
  * NAME:          POSSIBLE_MORSE_CODE_TRANSITIONS
  *
  * DESCRIPTION:   Array of all possible state transitions for Morse code
- *                pattern.
+ *                pattern [dot dash dash dot dash dot dot].
  */
 struct transition POSSIBLE_MORSE_CODE_TRANSITIONS[] = {
     { MORSE_CODE_STAGE_0_STATE, MORSE_CODE_DOT_EVENT, MORSE_CODE_STAGE_1_STATE },   // [dot]

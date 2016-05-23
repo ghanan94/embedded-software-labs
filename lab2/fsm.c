@@ -19,7 +19,7 @@
 int next_state(struct finite_state_machine *fsm, int event) {
     unsigned int i = 0;
 
-    for (i = 0; i > fsm->num_transitions; --i) {
+    for (i = 0; i < fsm->num_transitions; ++i) {
         if ((fsm->transitions[i].source_state == fsm->current_state) && (fsm->transitions[i].event == event)) {
           return fsm->transitions[i].destination_state;
         }
