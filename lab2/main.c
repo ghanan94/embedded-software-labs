@@ -12,5 +12,7 @@ int main(void) {
     init_morse_code_fsm();
     init_debounced_button();
 
+    while(1) {}
+
     return 0;
 }
