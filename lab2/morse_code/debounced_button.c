@@ -213,7 +213,8 @@ void init_led(void) {
 /*
  * NAME:          init_timer
  *
- * DESCRIPTION:   Initializes and sets up the timer to tick every 1 ms.
+ * DESCRIPTION:   Initializes and sets up the timer to tick every
+ *                <TIME_BETWEEN_BUTTON_READS_MS> ms.
  *
  * PARAMETERS:
  *  N/A
