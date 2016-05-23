@@ -19,19 +19,31 @@
 #define DASH_DELAY_THRESHOLD_MS 500
 
 /*
+ * NAME:          NUM_BUTTON_READS
+ *
+ * DESCRIPTION:   Number of times button status must be constant before an
+ *                event is considered valid (for debouncing).
+ *                ******IF THIS VALUE MUST BE MORE THAN 8, THE VARIABLE
+ *                <button_reads>'s TYPE MUST BE UPDATED AS IT IS CURRENTLY
+ *                AN UNSIGNED CHAR WHICH ONLY ALLOWS 8 BITS.*******
+ */
+#define NUM_BUTTON_READS 5
+
+/*
+ * NAME:          BUTTON_READ_MASK
+ *
+ * DESCRIPTION:   Mask for button status. If <NUM_BUTTON_READS> LSB are all 1
+ *                then pressed; if <NUM_BOTTON_READS> LSB are all 0 then
+ *                released; else bouncing.
+ */
+#define BUTTON_READ_MASK ((1 << NUM_BUTTON_READS) - 1)
+
+/*
  * NAME:          NUM_POSSIBLE_BUTTON_TRANSITIONS
  *
  * DESCRIPTION:   Total number of button transitions.
  */
 #define NUM_POSSIBLE_BUTTON_TRANSITIONS 2
-
-/*
- * NAME:          NUM_BUTTON_READS
- *
- * DESCRIPTION:   Mask for button status. If 5 LSB are all 1 then pressed; if
- *                5 LSB are all 0 then released; else bouncing. (2^5-1=31=0x1F)
- */
-#define BUTTON_READ_MASK 0x1F
 
 /*
  * NAME:          POSSIBLE_BUTTON_TRANSITIONS
@@ -118,7 +130,9 @@ void debounced_button_state_transition(int previous_state, int event, int curren
 /*
  * NAME:          read_debounced_button
  *
- * DESCRIPTION:   Read button status and debounce.
+ * DESCRIPTION:   Read button status and debounce. Debounce is implemented by
+ *                Polling the button's status (pressed or not) every
+ *                millisecond, until it is constant <NUM_BUTTON_READS> times.
  *
  * PARAMETERS:
  *  N/A
