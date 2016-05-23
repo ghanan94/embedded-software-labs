@@ -36,11 +36,15 @@ struct transition {
  *    - Total number of possible state transitions.
  *  struct transition *transitions
  *    - Array of all possible state transitions.
+ *  void (*transition_function)(int, int, int)
+ *    - Pointer to a function that accepts 3 parameters (previous_state, event,
+      current_state);
  */
 struct finite_state_machine {
   int current_state;
   unsigned int num_transitions;
   struct transition *transitions;
+  void (*transition_function)(int, int, int);
 };
 
 /*

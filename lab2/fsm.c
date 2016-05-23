@@ -34,6 +34,7 @@ int next_state(struct finite_state_machine *fsm, int event) {
  * See fsm.h for comments.
  */
 void perform_state_transition(struct finite_state_machine *fsm, int event) {
+    int previous_state = fsm->current_state;
     int new_state = next_state(fsm, event);
 
     if (new_state == -1) {
@@ -43,4 +44,9 @@ void perform_state_transition(struct finite_state_machine *fsm, int event) {
     }
 
     fsm->current_state = new_state;
+
+    // If a transition function was set, call it
+    if (fsm->transition_function) {
+        fsm->transition_function(previous_state, event, new_state);
+    }
 }
