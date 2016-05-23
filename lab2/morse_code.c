@@ -98,7 +98,6 @@ void morse_code_state_transition(int previous_state, int event, int current_stat
  * See morse_code.h for comments.
  */
 void init_morse_code_fsm(void) {
-
     morse_code_fsm = (struct finite_state_machine *) malloc(sizeof(struct finite_state_machine));
 
     morse_code_fsm->current_state = MORSE_CODE_STAGE_0_STATE;
