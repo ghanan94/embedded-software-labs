@@ -31,8 +31,25 @@ struct transition POSSIBLE_MORSE_CODE_TRANSITIONS[] = {
     { MORSE_CODE_STAGE_6_STATE, MORSE_CODE_DASH_EVENT, MORSE_CODE_STAGE_2_STATE }   // dot dash dash dot dash [dot dash]
 };
 
+/*
+ * NAME:          CORRECT_TEXT
+ *
+ * DESCRIPTION:   The text for 'CORRECT'.
+ */
 unsigned char CORRECT_TEXT[] = "CORRECT\0";
+
+/*
+ * NAME:          DOT_TEXT
+ *
+ * DESCRIPTION:   The text for 'DOT'.
+ */
 unsigned char DOT_TEXT[] = "DOT\0";
+
+/*
+ * NAME:          DASH_TEXT
+ *
+ * DESCRIPTION:   The text for 'DASH'.
+ */
 unsigned char DASH_TEXT[] = "DASH\0";
 
 /*
