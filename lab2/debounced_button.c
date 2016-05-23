@@ -150,34 +150,34 @@ void read_debounced_button(void) {
  * RETURNS:
  *  N/A
  */
- void init_timer(void) {
-     LPC_TIM0->TCR = 0x02; // Reset Timer
-     LPC_TIM0->TCR = 0x01; // Enable Timer
-     LPC_TIM0->MR0 = 25000; // Match value  (M = 100; N = 6; F = 12MHz; CCLKSEL set to divide by 4; PCLK_TIMER0 set to divice by 4
-                            // so 2 * M * F / (N * CCLKSEL_DIV_VALUE * PCLK_DIV_TIMER0 * 1000) = 2 * 100 * 12000000/(6 * 4 * 4 * 1000) = 25000
-     LPC_TIM0->MCR |= 0x03; // On match, generate interrupt and reset
-     NVIC_EnableIRQ(TIMER0_IRQn); // Allow for interrupts from Timer0
+void init_timer(void) {
+    LPC_TIM0->TCR = 0x02; // Reset Timer
+    LPC_TIM0->TCR = 0x01; // Enable Timer
+    LPC_TIM0->MR0 = 25000; // Match value  (M = 100; N = 6; F = 12MHz; CCLKSEL set to divide by 4; PCLK_TIMER0 set to divice by 4
+                           // so 2 * M * F / (N * CCLKSEL_DIV_VALUE * PCLK_DIV_TIMER0 * 1000) = 2 * 100 * 12000000/(6 * 4 * 4 * 1000) = 25000
+    LPC_TIM0->MCR |= 0x03; // On match, generate interrupt and reset
+    NVIC_EnableIRQ(TIMER0_IRQn); // Allow for interrupts from Timer0
  }
 
- /*
-  * NAME:          TIMER0_IRQHandler
-  *
-  * DESCRIPTION:   Interrupt handler for TIMER0. Should fire every 1 ms.
-  *
-  * PARAMETERS:
-  *  N/A
-  *
-  * RETURNS:
-  *  N/A
-  */
- void TIMER0_IRQHandler(void) {
+/*
+ * NAME:          TIMER0_IRQHandler
+ *
+ * DESCRIPTION:   Interrupt handler for TIMER0. Should fire every 1 ms.
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  N/A
+ */
+void TIMER0_IRQHandler(void) {
     LPC_TIM0->IR |= 0x01; // Clear interrupt request
 
     if ((++current_time % TIME_BETWEEN_BUTTON_READS_MS) == 0) {
         // Time has passed since last button read
         read_debounced_button();
     }
- }
+}
 
 /*
  * NAME:          init_debounced_button_fsm
