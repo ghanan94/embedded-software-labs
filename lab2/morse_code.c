@@ -76,6 +76,15 @@ struct finite_state_machine morse_code_fsm;
  *  N/A
  */
 void morse_code_state_transition(int previous_state, int event, int current_state) {
+    if ((previous_state == MORSE_CODE_STAGE_7_STATE) && (previous_state == current_state)) {
+        // Previous state was the final stage in the fsm.
+        // Do nothing after this unless for some reason,
+        // the state changed (shouldn't happen though)
+        // This prevents 'CORRECT' text from flickering on
+        // button press.
+        return;
+    }
+
     if (current_state == MORSE_CODE_STAGE_7_STATE) {
         GLCD_Clear(White);
         GLCD_DisplayString(0, 0, 1, CORRECT_TEXT);
