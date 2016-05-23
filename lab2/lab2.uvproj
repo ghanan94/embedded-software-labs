@@ -411,6 +411,26 @@
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
             </File>
+            <File>
+              <FileName>morse_code.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\morse_code.c</FilePath>
+            </File>
+            <File>
+              <FileName>morse_code.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\morse_code.h</FilePath>
+            </File>
+            <File>
+              <FileName>fsm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\fsm.c</FilePath>
+            </File>
+            <File>
+              <FileName>fsm.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\fsm.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
