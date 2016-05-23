@@ -91,6 +91,11 @@ unsigned char button_reads;
  *  N/A
  */
 void debounced_button_state_transition(int previous_state, int event, int current_state) {
+    if (previous_state == current_state) {
+        // Nothing happened
+        return;
+    }
+
     switch (event) {
         case BUTTON_PRESS_EVENT:
             // Time that the putton was pressed
