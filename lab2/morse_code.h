@@ -64,10 +64,9 @@ enum MORSE_CODE_EVENTS {
 /*
  * NAME:          morse_code_fsm
  *
- * DESCRIPTION:   Pointer to the finite state machine for the Morse code
- *                pattern specified.
+ * DESCRIPTION:   Finite state machine for the Morse code pattern specified.
  */
-extern struct finite_state_machine *morse_code_fsm;
+extern struct finite_state_machine morse_code_fsm;
 
 /*
  * NAME:          init_morse_code_fsm

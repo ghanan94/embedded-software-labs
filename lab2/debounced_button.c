@@ -31,9 +31,9 @@ struct transition POSSIBLE_BUTTON_TRANSITIONS[] = {
 /*
  * NAME:          debounced_button_fsm
  *
- * DESCRIPTION:   Pointer to the finite state machine for the debounced button.
+ * DESCRIPTION:   Finite state machine for the debounced button.
  */
-struct finite_state_machine *debounced_button_fsm;
+struct finite_state_machine debounced_button_fsm;
 
 /*
  * NAME:          current_time
@@ -77,10 +77,10 @@ void debounced_button_state_transition(int previous_state, int event, int curren
             // a threshold, it is a DASH; otherwise it is a DOT.
             if ((current_time - last_button_press_time) >= DASH_DELAY_THRESHOLD_MS) {
                 // DASH occured
-                perform_state_transition(morse_code_fsm, MORSE_CODE_DASH_EVENT);
+                perform_state_transition(&morse_code_fsm, MORSE_CODE_DASH_EVENT);
             } else {
                 // DOT occured
-                perform_state_transition(morse_code_fsm, MORSE_CODE_DOT_EVENT);
+                perform_state_transition(&morse_code_fsm, MORSE_CODE_DOT_EVENT);
             }
             break;
     }
@@ -136,12 +136,10 @@ void debounced_button_state_transition(int previous_state, int event, int curren
  *  N/A
  */
 void init_debounced_button_fsm(void) {
-  debounced_button_fsm = (struct finite_state_machine *) malloc(sizeof(struct finite_state_machine));
-
-  debounced_button_fsm->current_state = BUTTON_RELEASED_STATE;
-  debounced_button_fsm->num_transitions = NUM_POSSIBLE_BUTTON_TRANSITIONS;
-  debounced_button_fsm->transitions = POSSIBLE_BUTTON_TRANSITIONS;
-  debounced_button_fsm->transition_function = &debounced_button_state_transition;
+  debounced_button_fsm.current_state = BUTTON_RELEASED_STATE;
+  debounced_button_fsm.num_transitions = NUM_POSSIBLE_BUTTON_TRANSITIONS;
+  debounced_button_fsm.transitions = POSSIBLE_BUTTON_TRANSITIONS;
+  debounced_button_fsm.transition_function = &debounced_button_state_transition;
 }
 
 /*

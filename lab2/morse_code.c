@@ -54,7 +54,7 @@ unsigned char DASH_TEXT[] = "DASH\0";
 /*
  * See morse_code.h for comments.
  */
-struct finite_state_machine *morse_code_fsm;
+struct finite_state_machine morse_code_fsm;
 
 /*
  * NAME:          morse_code_state_transition
@@ -97,10 +97,8 @@ void morse_code_state_transition(int previous_state, int event, int current_stat
  * See morse_code.h for comments.
  */
 void init_morse_code_fsm(void) {
-    morse_code_fsm = (struct finite_state_machine *) malloc(sizeof(struct finite_state_machine));
-
-    morse_code_fsm->current_state = MORSE_CODE_STAGE_0_STATE;
-    morse_code_fsm->num_transitions = NUM_POSSIBLE_MORSE_CODE_TRANSITIONS;
-    morse_code_fsm->transitions = POSSIBLE_MORSE_CODE_TRANSITIONS;
-    morse_code_fsm->transition_function = &morse_code_state_transition;
+    morse_code_fsm.current_state = MORSE_CODE_STAGE_0_STATE;
+    morse_code_fsm.num_transitions = NUM_POSSIBLE_MORSE_CODE_TRANSITIONS;
+    morse_code_fsm.transitions = POSSIBLE_MORSE_CODE_TRANSITIONS;
+    morse_code_fsm.transition_function = &morse_code_state_transition;
 }
