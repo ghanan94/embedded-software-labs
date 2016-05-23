@@ -431,6 +431,16 @@
               <FileType>5</FileType>
               <FilePath>.\fsm.h</FilePath>
             </File>
+            <File>
+              <FileName>debounced_button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\debounced_button.c</FilePath>
+            </File>
+            <File>
+              <FileName>debounced_button.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\debounced_button.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
