@@ -7,6 +7,13 @@
  * NAME:          TIME_BETWEEN_BUTTON_READS_MS
  *
  * DESCRIPTION:   Time in milliseconds between reading button status.
+ *                ******IF THIS NUMBER IS TO BE ANY HIGHER, MAY WANT TO
+ *                RECONSIDER HOW THE TIMER TICKING AND <current_time> TRACKING
+ *                IS IMPLEMENTED. Right now a timer tick occurs every
+ *                <TIME_BETWEEN_BUTTON_READS_MS> milliseconds, and current_time
+ *                is incremented by <TIME_BETWEEN_BUTTON_READS_MS>. This creates
+ *                an inacurancy of current_time of up to
+ *                <TIME_BETWEEN_BUTTON_READS_MS> milliseconds.*********
  */
 #define TIME_BETWEEN_BUTTON_READS_MS 5
 
@@ -172,8 +179,14 @@ void read_debounced_button(void) {
 void init_timer(void) {
     LPC_TIM0->TCR = 0x02; // Reset Timer
     LPC_TIM0->TCR = 0x01; // Enable Timer
-    LPC_TIM0->MR0 = 25000; // Match value  (M = 100; N = 6; F = 12MHz; CCLKSEL set to divide by 4; PCLK_TIMER0 set to divice by 4
-                           // so 2 * M * F / (N * CCLKSEL_DIV_VALUE * PCLK_DIV_TIMER0 * 1000) = 2 * 100 * 12000000/(6 * 4 * 4 * 1000) = 25000
+    // Match value of 25000 means the timer's ISR will tick every 1ms
+    // given below parameters.
+    //(M = 100; N = 6; F = 12MHz; CCLKSEL set to divide by 4; PCLK_TIMER0 set to divice by 4
+    // so 2 * M * F / (N * CCLKSEL_DIV_VALUE * PCLK_DIV_TIMER0 * 1000) = 2 * 100 * 12000000/(6 * 4 * 4 * 1000) = 25000
+    // Multiplying above value by TIME_BETWEEN_BUTTON_READS_MS allows us to only
+    // have to call the ISR when a read is supposed to occur,
+    // instead of every time. At worse case, this occurs every 1 ms.
+    LPC_TIM0->MR0 = 25000 * TIME_BETWEEN_BUTTON_READS_MS;
     LPC_TIM0->MCR |= 0x03; // On match, generate interrupt and reset
     NVIC_EnableIRQ(TIMER0_IRQn); // Allow for interrupts from Timer0
  }
@@ -181,7 +194,11 @@ void init_timer(void) {
 /*
  * NAME:          TIMER0_IRQHandler
  *
- * DESCRIPTION:   Interrupt handler for TIMER0. Should fire every 1 ms.
+ * DESCRIPTION:   Interrupt handler for TIMER0. Should fire every time a button
+ *                read should occur. The current time is incremented every time
+ *                this happens. Downfall of this is that timer is not as
+ *                accurate as can be, but we can save many unneeded calls to
+ *                the ISR when TIME_BETWEEN_BUTTON_READS_MS > 1.
  *
  * PARAMETERS:
  *  N/A
@@ -192,10 +209,10 @@ void init_timer(void) {
 void TIMER0_IRQHandler(void) {
     LPC_TIM0->IR |= 0x01; // Clear interrupt request
 
-    if ((++current_time % TIME_BETWEEN_BUTTON_READS_MS) == 0) {
-        // Time has passed since last button read
-        read_debounced_button();
-    }
+    current_time += TIME_BETWEEN_BUTTON_READS_MS;
+
+    read_debounced_button();
+
 }
 
 /*
