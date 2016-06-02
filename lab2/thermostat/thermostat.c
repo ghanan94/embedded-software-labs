@@ -113,8 +113,8 @@ void thermostat_state_transition(int previous_state, int event, int current_stat
  * RETURNS:
  *  N/A
  */
-void TIMER0_IRQHandler(void) {
-    LPC_TIM0->IR |= 0x01; // Clear interrupt request
+void TIMER1_IRQHandler(void) {
+    LPC_TIM1->IR |= 0x01; // Clear interrupt request
 
     // Start the A/D conversion to get
     // actual temperature data (potentiometer)
@@ -161,8 +161,8 @@ void ADC_IRQHandler(void) {
  *  N/A
  */
 void init_timer(void) {
-    LPC_TIM0->TCR = 0x02; // Reset Timer
-    LPC_TIM0->TCR = 0x01; // Enable Timer
+    LPC_TIM1->TCR = 0x02; // Reset Timer
+    LPC_TIM1->TCR = 0x01; // Enable Timer
     // Match value of 25000 means the timer's ISR will tick every 1ms
     // given below parameters.
     //(M = 100; N = 6; F = 12MHz; CCLKSEL set to divide by 4; PCLK_TIMER0 set to divice by 4
@@ -170,9 +170,9 @@ void init_timer(void) {
     // Multiplying above value by TIME_BETWEEN_TEMPERATURE_READS_MS allows us to only
     // have to call the ISR when a read is supposed to occur,
     // instead of every time. At worse case, this occurs every 1 ms.
-    LPC_TIM0->MR0 = 25000 * TIME_BETWEEN_TEMPERATURE_READS_MS;
-    LPC_TIM0->MCR |= 0x03; // On match, generate interrupt and reset
-    NVIC_EnableIRQ(TIMER0_IRQn); // Allow for interrupts from Timer0
+    LPC_TIM1->MR0 = 25000 * TIME_BETWEEN_TEMPERATURE_READS_MS;
+    LPC_TIM1->MCR |= 0x03; // On match, generate interrupt and reset
+    NVIC_EnableIRQ(TIMER1_IRQn); // Allow for interrupts from Timer0
 }
 
 /*
