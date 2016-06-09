@@ -64,4 +64,30 @@ extern struct finite_state_machine thermostat_fsm;
  */
 void init_thermostat(void);
 
+/*
+ * NAME:          increase_thermostat_set_temperature
+ *
+ * DESCRIPTION:   Increase thermostat's set temperature
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  N/A
+ */
+void increase_thermostat_set_temperature(void);
+
+/*
+ * NAME:          decrease_thermostat_set_temperature
+ *
+ * DESCRIPTION:   Decrease thermostat's set temperature
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  N/A
+ */
+void decrease_thermostat_set_temperature(void);
+
 #endif

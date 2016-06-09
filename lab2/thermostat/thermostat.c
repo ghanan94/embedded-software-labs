@@ -161,7 +161,7 @@ void ADC_IRQHandler(void) {
  * RETURNS:
  *  N/A
  */
-void init_timer(void) {
+static void init_timer(void) {
     LPC_TIM1->TCR = 0x02; // Reset Timer
     LPC_TIM1->TCR = 0x01; // Enable Timer
     // Match value of 25000 means the timer's ISR will tick every 1ms
@@ -215,4 +215,18 @@ void init_thermostat(void) {
 
     init_adc();
     init_timer();
+}
+
+/*
+ * See thermostat.h for comments.
+ */
+void increase_thermostat_set_temperature(void) {
+  ++set_temperature;
+}
+
+/*
+ * See thermostat.h for comments.
+ */
+void decrease_thermostat_set_temperature(void) {
+  --set_temperature;
 }
