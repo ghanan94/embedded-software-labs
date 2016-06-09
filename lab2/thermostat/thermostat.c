@@ -139,13 +139,13 @@ void ADC_IRQHandler(void) {
 
     if (actual_temperature > set_temperature) {
         // TOO HOT
-        perform_state_transition(&thermostat_fsm, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_HOT_EVENT);
+        transition_state(&thermostat_fsm, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_HOT_EVENT);
     } else if (actual_temperature < set_temperature) {
         // TOO COLD
-        perform_state_transition(&thermostat_fsm, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_COOL_EVENT);
+        transition_state(&thermostat_fsm, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_COOL_EVENT);
     } else {
         // OKAY
-        perform_state_transition(&thermostat_fsm, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_OKAY_EVENT);
+        transition_state(&thermostat_fsm, THERMOSTAT_ACTUAL_TEMPERATURE_SENSED_OKAY_EVENT);
     }
 }
 

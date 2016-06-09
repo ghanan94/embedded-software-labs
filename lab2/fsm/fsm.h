@@ -48,7 +48,7 @@ struct finite_state_machine {
 };
 
 /*
- * NAME:          perform_state_transition
+ * NAME:          transition_state
  *
  * DESCRIPTION:   Update the finite state machine's current state, given an
  *                event.
@@ -62,6 +62,6 @@ struct finite_state_machine {
  * RETURNS:
  *  N/A
  */
-void perform_state_transition(struct finite_state_machine *, int);
+void transition_state(struct finite_state_machine *, int);
 
 #endif

@@ -158,19 +158,19 @@ void read_debounced_buttons(void) {
 	// Check if up button has stopped bouncing and if it is pressed/released
     if (up_button_read_masked == BUTTON_READ_MASK) {
         // Pressed
-        perform_state_transition(&debounced_up_button_fsm, BUTTON_PRESS_EVENT);
+        transition_state(&debounced_up_button_fsm, BUTTON_PRESS_EVENT);
     } else if (up_button_read_masked == 0) {
         // Released
-        perform_state_transition(&debounced_up_button_fsm, BUTTON_RELEASE_EVENT);
+        transition_state(&debounced_up_button_fsm, BUTTON_RELEASE_EVENT);
     }
 
 	// Check if down button has stopped bouncing and if it is pressed/released
     if (down_button_read_masked == BUTTON_READ_MASK) {
         // Pressed
-        perform_state_transition(&debounced_down_button_fsm, BUTTON_PRESS_EVENT);
+        transition_state(&debounced_down_button_fsm, BUTTON_PRESS_EVENT);
     } else if (down_button_read_masked == 0) {
         // Released
-        perform_state_transition(&debounced_down_button_fsm, BUTTON_RELEASE_EVENT);
+        transition_state(&debounced_down_button_fsm, BUTTON_RELEASE_EVENT);
     }
 }
 
