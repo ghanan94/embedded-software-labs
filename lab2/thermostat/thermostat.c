@@ -134,7 +134,8 @@ void TIMER1_IRQHandler(void) {
  *  N/A
  */
 void ADC_IRQHandler(void) {
-    int actual_temperature = (LPC_ADC->ADDR2 >> 4) & 0xFFF; // read ADC Result
+    int actual_temperature = ((LPC_ADC->ADGDR >> 4) & 0xFFF) / 40; // read ADC Result
+	// ADC returns 0x0 to 0xFFF (4096) so make it so system only in temperatures beween 0 and 100
 
     if (actual_temperature > set_temperature) {
         // TOO HOT
@@ -188,7 +189,7 @@ void init_timer(void) {
  */
 void init_adc(void) {
     LPC_PINCON->PINSEL1 &= ~(3 << 18);
-    LPC_PINCON->PINSEL1 &= (1 << 18); // P0.25 is AD0.2
+    LPC_PINCON->PINSEL1 |= (1 << 18); // P0.25 is AD0.2
 
     LPC_SC->PCONP |= (1 << 12); // Enable power to ADC block
 
