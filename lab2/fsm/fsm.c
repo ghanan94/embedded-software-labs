@@ -33,7 +33,7 @@ int next_state(struct finite_state_machine *fsm, int event) {
 /*
  * See fsm.h for comments.
  */
-void perform_state_transition(struct finite_state_machine *fsm, int event) {
+void transition_state(struct finite_state_machine *fsm, int event) {
     int previous_state = fsm->current_state;
     int new_state = next_state(fsm, event);
 

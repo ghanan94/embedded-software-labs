@@ -4,7 +4,7 @@
 #ifndef _DEBOUNCED_BUTTON_H
 #define _DEBOUNCED_BUTTON_H
 
-#include "fsm.h"
+#include <fsm/fsm.h>
 
 /*
  * NAME:          BUTTON_STATES

@@ -132,10 +132,10 @@ void debounced_button_state_transition(int previous_state, int event, int curren
             // a threshold, it is a DASH; otherwise it is a DOT.
             if ((current_time - last_button_press_time) >= DASH_DELAY_THRESHOLD_MS) {
                 // DASH occured
-                perform_state_transition(&morse_code_fsm, MORSE_CODE_DASH_EVENT);
+                transition_state(&morse_code_fsm, MORSE_CODE_DASH_EVENT);
             } else {
                 // DOT occured
-                perform_state_transition(&morse_code_fsm, MORSE_CODE_DOT_EVENT);
+                transition_state(&morse_code_fsm, MORSE_CODE_DOT_EVENT);
             }
             break;
     }
@@ -185,10 +185,10 @@ void read_debounced_button(void) {
 
     if (button_read_masked == BUTTON_READ_MASK) {
         // Pressed
-        perform_state_transition(&debounced_button_fsm, BUTTON_PRESS_EVENT);
+        transition_state(&debounced_button_fsm, BUTTON_PRESS_EVENT);
     } else if (button_read_masked == 0) {
         // Released
-        perform_state_transition(&debounced_button_fsm, BUTTON_RELEASE_EVENT);
+        transition_state(&debounced_button_fsm, BUTTON_RELEASE_EVENT);
         turn_on_led(0); // Turn led off
     }
 }
@@ -213,7 +213,8 @@ void init_led(void) {
 /*
  * NAME:          init_timer
  *
- * DESCRIPTION:   Initializes and sets up the timer to tick every 1 ms.
+ * DESCRIPTION:   Initializes and sets up the timer to tick every
+ *                <TIME_BETWEEN_BUTTON_READS_MS> ms.
  *
  * PARAMETERS:
  *  N/A

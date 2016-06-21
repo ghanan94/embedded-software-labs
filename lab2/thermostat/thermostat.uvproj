@@ -44,7 +44,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\</OutputDirectory>
-          <OutputName>lab2</OutputName>
+          <OutputName>thermostat</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -163,7 +163,7 @@
             <DriverSelection>-1</DriverSelection>
           </Flash1>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3>"" ()</Flash3>
+          <Flash3></Flash3>
           <Flash4></Flash4>
         </Utilities>
         <TargetArmAds>
@@ -346,7 +346,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath></IncludePath>
+              <IncludePath>../</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -384,7 +384,7 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>Source Group 1</GroupName>
+          <GroupName>System</GroupName>
           <Files>
             <File>
               <FileName>startup_LPC17xx.s</FileName>
@@ -406,40 +406,50 @@
               <FileType>1</FileType>
               <FilePath>.\system_LPC17xx.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Main</GroupName>
+          <Files>
             <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>morse_code.c</FileName>
+              <FileName>thermostat.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\morse_code.c</FilePath>
+              <FilePath>.\thermostat.c</FilePath>
             </File>
             <File>
-              <FileName>morse_code.h</FileName>
+              <FileName>thermostat.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\morse_code.h</FilePath>
+              <FilePath>.\thermostat.h</FilePath>
             </File>
+            <File>
+              <FileName>debounced_buttons.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\debounced_buttons.c</FilePath>
+            </File>
+            <File>
+              <FileName>debounced_buttons.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\debounced_buttons.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>FSM</GroupName>
+          <Files>
             <File>
               <FileName>fsm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\fsm.c</FilePath>
+              <FilePath>..\fsm\fsm.c</FilePath>
             </File>
             <File>
               <FileName>fsm.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\fsm.h</FilePath>
-            </File>
-            <File>
-              <FileName>debounced_button.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\debounced_button.c</FilePath>
-            </File>
-            <File>
-              <FileName>debounced_button.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\debounced_button.h</FilePath>
+              <FilePath>..\fsm\fsm.h</FilePath>
             </File>
           </Files>
         </Group>
