@@ -416,6 +416,16 @@
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
             </File>
+            <File>
+              <FileName>bursty_scheduler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\bursty_scheduler.c</FilePath>
+            </File>
+            <File>
+              <FileName>bursty_scheduler.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\bursty_scheduler.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
