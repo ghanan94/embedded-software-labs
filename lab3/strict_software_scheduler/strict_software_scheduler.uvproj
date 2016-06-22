@@ -150,7 +150,7 @@
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
             <InitializationFile></InitializationFile>
-            <Driver></Driver>
+            <Driver>BIN\AGDIRDI.DLL</Driver>
           </TargetDlls>
         </DebugOption>
         <Utilities>
