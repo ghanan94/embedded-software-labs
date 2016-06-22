@@ -9,6 +9,13 @@
 #define MIN_TIME_BETWEEN_INTERRUPTS_MS 10000
 
 /*
+ * NAME:          LED_ON_TIME_MS
+ *
+ * DESCRIPTION:   Time in milliseconds led is on for.
+ */
+#define LED_ON_TIME_MS 500
+
+/*
  * NAME:          TIMER0_IRQHandler
  *
  * DESCRIPTION:   Interrupt handler for TIMER0. Should fire
@@ -33,6 +40,26 @@ void TIMER0_IRQHandler(void) {
 }
 
 /*
+ * NAME:          TIMER1_IRQHandler
+ *
+ * DESCRIPTION:   Interrupt handler for TIMER1. Should fire
+ *                <LED_ON_TIME_MS> milliseconds after a button
+ *                interrupt occured so an led can be turned off. (On button
+ *                interrupt, led turns on.)
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  N/A
+ */
+void TIMER1_IRQHandler(void) {
+    LPC_TIM1->IR |= 0x01; // Clear interrupt request
+
+    LPC_GPIO2->FIOCLR = 1 << 6; // Turn off led P2.6
+}
+
+/*
  * NAME:          EINT3_IRQHandler
  *
  * DESCRIPTION:   Interrupt handler for INT0.
@@ -50,6 +77,10 @@ void EINT3_IRQHandler(void) {
     NVIC_DisableIRQ(EINT3_IRQn);
     LPC_TIM0->TCR = 0x01; // Enable timer that will enable interrupts again
                           // after some time.
+
+    LPC_GPIO2->FIOSET = 1 << 6; // Turn on led P2.6
+    LPC_TIM1->TCR = 0x01; // Enable timer that will turn off led after
+                          // <LED_ON_TIME_MS> milliseconds.
 }
 
 /*
@@ -80,6 +111,37 @@ void init_timer(void) {
  }
 
 /*
+ * NAME:          init_led
+ *
+ * DESCRIPTION:   Initializes and sets up a led and a timer to keep the led on
+ *                for only <LED_ON_TIME_MS> milliseconds.
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  N/A
+ */
+void init_led(void) {
+    // Only init the right most led
+    LPC_GPIO2->FIODIR |= 1 << 6; // LED on PORT2.6;
+
+    // Init the timer for the LED to keep it on only for <LED_ON_TIME_MS> milliseconds
+    LPC_TIM1->TCR = 0x02; // Reset Timer
+    LPC_TIM1->TCR = 0x00; // Complete reset, but do not enable Timer
+    // Match value of 25000 means the timer's ISR will tick every 1ms
+    // given below parameters.
+    //(M = 100; N = 6; F = 12MHz; CCLKSEL set to divide by 4; PCLK_TIMER0 set to divice by 4
+    // so 2 * M * F / (N * CCLKSEL_DIV_VALUE * PCLK_DIV_TIMER0 * 1000) = 2 * 100 * 12000000/(6 * 4 * 4 * 1000) = 25000
+    // Multiplying above value by MIN_TIME_BETWEEN_INTERRUPTS_MS allows us to only
+    // have to call the ISR when the minimum time between interrupts has passed
+    // and we can re-enable interrupts.
+    LPC_TIM1->MR0 = 25000 * LED_ON_TIME_MS;
+    LPC_TIM1->MCR |= 0x07; // On match, generate interrupt, reset and stop counting
+    NVIC_EnableIRQ(TIMER1_IRQn); // Allow for interrupts from Timer0
+}
+
+/*
  * See strict_scheduler.h for comments.
  */
 void init_strict_scheduled_button(void) {
@@ -89,4 +151,5 @@ void init_strict_scheduled_button(void) {
     NVIC_EnableIRQ(EINT3_IRQn);
 
     init_timer();
+		init_led();
 }
