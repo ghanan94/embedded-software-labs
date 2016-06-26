@@ -1,5 +1,6 @@
 #include "strict_scheduler.h"
 #include <lpc17xx.h>
+#include "glcd.h"
 
 /*
  * NAME:          MIN_TIME_BETWEEN_INTERRUPTS_MS
@@ -38,6 +39,7 @@ void TIMER0_IRQHandler(void) {
     LPC_GPIOINT->IO2IntClr |= 1 << 10; // Clear interrupt on P2.10
     NVIC_EnableIRQ(EINT3_IRQn);
     NVIC_ClearPendingIRQ(EINT3_IRQn);
+    GLCD_DisplayString(0, 0, 1, "Waiting 4 Interrupt ");
 }
 
 /*
@@ -57,7 +59,8 @@ void TIMER0_IRQHandler(void) {
 void TIMER1_IRQHandler(void) {
     LPC_TIM1->IR |= 0x01; // Clear interrupt request
 
-    LPC_GPIO1->FIOCLR = 1 << 28; // Turn off led P1.28
+    LPC_GPIO1->FIOCLR = 1 << 28; // Turn off led P1.2
+    GLCD_DisplayString(0, 0, 1, "Interrupts disabled ");
 }
 
 /*
@@ -82,6 +85,7 @@ void EINT3_IRQHandler(void) {
     LPC_GPIO1->FIOSET = 1 << 28; // Turn on led P1.28
     LPC_TIM1->TCR = 0x01; // Enable timer that will turn off led after
                           // <LED_ON_TIME_MS> milliseconds.
+    GLCD_DisplayString(0, 0, 1, "Handling Interrupt  ");
 }
 
 /*
@@ -154,5 +158,7 @@ void init_strict_scheduled_button(void) {
     NVIC_EnableIRQ(EINT3_IRQn);
 
     init_timer();
-		init_led();
+    init_led();
+
+    GLCD_DisplayString(0, 0, 1, "Waiting 4 Interrupt ");
 }
