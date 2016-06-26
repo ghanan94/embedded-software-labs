@@ -13,7 +13,7 @@
  *
  * DESCRIPTION:   Time in milliseconds led is on for.
  */
-#define LED_ON_TIME_MS 500
+#define LED_ON_TIME_MS 200
 
 /*
  * NAME:          TIMER0_IRQHandler
@@ -35,8 +35,9 @@ void TIMER0_IRQHandler(void) {
 
     // Re-enable interrupts for INT0 after the minimum time has passed.
     // Clear any active interrupt requests incase there are any.
-    NVIC_ClearPendingIRQ(EINT3_IRQn);
+    LPC_GPIOINT->IO2IntClr |= 1 << 10; // Clear interrupt on P2.10
     NVIC_EnableIRQ(EINT3_IRQn);
+    NVIC_ClearPendingIRQ(EINT3_IRQn);
 }
 
 /*
