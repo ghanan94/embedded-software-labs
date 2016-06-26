@@ -74,6 +74,8 @@ void TIMER0_IRQHandler(void) {
     // Re-enable interrupts for INT0 after the minimum time has passed.
     // Clear any active interrupt requests incase there are any.
     number_of_bursts = 0;
+	//NVIC_ClearPendingIRQ(EINT3_IRQn);
+	LPC_GPIOINT->IO2IntClr |= 1 << 10; // Clear interrupt on P2.10
     NVIC_EnableIRQ(EINT3_IRQn);
 	NVIC_ClearPendingIRQ(EINT3_IRQn);
 }
