@@ -57,7 +57,7 @@ void TIMER0_IRQHandler(void) {
 void TIMER1_IRQHandler(void) {
     LPC_TIM1->IR |= 0x01; // Clear interrupt request
 
-    LPC_GPIO2->FIOCLR = 1 << 6; // Turn off led P2.6
+    LPC_GPIO1->FIOCLR = 1 << 28; // Turn off led P1.28
 }
 
 /*
@@ -79,7 +79,7 @@ void EINT3_IRQHandler(void) {
     LPC_TIM0->TCR = 0x01; // Enable timer that will enable interrupts again
                           // after some time.
 
-    LPC_GPIO2->FIOSET = 1 << 6; // Turn on led P2.6
+    LPC_GPIO1->FIOSET = 1 << 28; // Turn on led P1.28
     LPC_TIM1->TCR = 0x01; // Enable timer that will turn off led after
                           // <LED_ON_TIME_MS> milliseconds.
 }
@@ -124,8 +124,10 @@ void init_timer(void) {
  *  N/A
  */
 void init_led(void) {
-    // Only init the right most led
-    LPC_GPIO2->FIODIR |= 1 << 6; // LED on PORT2.6;
+    // Init all leds so they are all off initially
+    // But we will only be using P1.28
+    LPC_GPIO2->FIODIR |= 0x7C; // LED on PORT2.2-PORT2.6;
+    LPC_GPIO1->FIODIR |= (unsigned)(0xB << 28); // LED on PORT1.28,1.29 and 1.31
 
     // Init the timer for the LED to keep it on only for <LED_ON_TIME_MS> milliseconds
     LPC_TIM1->TCR = 0x02; // Reset Timer
