@@ -21,7 +21,7 @@
  * DESCRIPTION:   Debounce button by making sure no button interrupts within
  *                <BUTTON_DEBOUNCE_TIME_100_MS> ms.
  */
-#define BUTTON_DEBOUNCE_TIME_100_MS 2
+#define BUTTON_DEBOUNCE_TIME_100_MS 5
 
 /*
  * NAME:          MIN_TIME_BETWEEN_INTERRUPT_BURSTS_MS
@@ -35,7 +35,7 @@
  *
  * DESCRIPTION:   Time in 100 milliseconds led is on for.
  */
-#define LED_ON_TIME_TIMES_100_MS 5
+#define LED_ON_TIME_TIMES_100_MS 2
 
 /*
  * NAME:          led_time_left
@@ -74,8 +74,8 @@ void TIMER0_IRQHandler(void) {
     // Re-enable interrupts for INT0 after the minimum time has passed.
     // Clear any active interrupt requests incase there are any.
     number_of_bursts = 0;
-    NVIC_ClearPendingIRQ(EINT3_IRQn);
     NVIC_EnableIRQ(EINT3_IRQn);
+	NVIC_ClearPendingIRQ(EINT3_IRQn);
 }
 
 /*
