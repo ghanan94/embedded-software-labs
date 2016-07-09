@@ -148,6 +148,9 @@ void initialize_task( xListItem *list_item, struct tcb *tcb, unsigned int id, un
 
 	// ListItem Value is used to hold the time when task should be unblocked.
 	listSET_LIST_ITEM_VALUE( list_item, period );
+
+	// Add task to ready list.
+	vListInsert( &ready_list, list_item );
 }
 
 /*
