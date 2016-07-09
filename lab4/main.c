@@ -8,25 +8,37 @@
 
 /* The ITM port is used to direct the printf() output to the serial window in
 the Keil simulator IDE. */
-#define mainITM_Port8(n)    (*((volatile unsigned char *)(0xE0000000+4*n)))
-#define mainITM_Port32(n)   (*((volatile unsigned long *)(0xE0000000+4*n)))
-#define mainDEMCR           (*((volatile unsigned long *)(0xE000EDFC)))
-#define mainTRCENA          0x01000000
+#define mainITM_Port8(n)     (*((volatile unsigned char *)(0xE0000000+4*n)))
+#define mainITM_Port32(n)    (*((volatile unsigned long *)(0xE0000000+4*n)))
+#define mainDEMCR            (*((volatile unsigned long *)(0xE000EDFC)))
+#define mainTRCENA           0x01000000
+
+#define NUM_TASKS            3
 
 /*
- * NAME:          NUM_TASKS
- *
- * DESCRIPTION:   Number of tasks.
+ * Task priority.
  */
-#define NUM_TASKS           3
+#define TASK_PRIORITY        (tskIDLE_PRIORITY + 1)
 
 /*
- * NAME:          TASK_PRIORITY
- *
- * DESCRIPTION:   Priority of each task (same for each task). The priority will
- *                be 1 step higher than an idle task.
+ * Scheduler priority must be greater than tasks.
  */
-#define TASK_PRIORITY       (tskIDLE_PRIORITY + 1)
+#define SCHEDULER_PRIORITY   (TASK_PRIORITY + 1)
+
+/*
+ * Execution time for each task.
+ */
+#define TASK1_EXECUTION_TIME (1000 / portTICK_RATE_MS) // 1 s to complete
+#define TASK1_EXECUTION_TIME (2000 / portTICK_RATE_MS) // 2 s to complete
+#define TASK1_EXECUTION_TIME (3000 / portTICK_RATE_MS) // 3 s to complete
+
+/*
+ * Period for tasks (time between task being re-started).
+ */
+#define TASK1_PERIOD         (4000 / portTICK_RATE_MS) // 4 s before restarting
+#define TASK2_PERIOD         (6000 / portTICK_RATE_MS) // 6 s before restarting
+#define TASK3_PERIOD         (8000 / portTICK_RATE_MS) // 8 s before restarting
+#define SCHEDULER_PRIORITY   (1000 / portTICK_RATE_MS) // 1 s before restarting
 /*-----------------------------------------------------------*/
 
 /*
@@ -42,6 +54,20 @@ the Keil simulator IDE. */
  *  N/A
  */
 void task( void * );
+
+/*
+ * NAME:          scheduler
+ *
+ * DESCRIPTION:   EDF Scheduler.
+ *
+ * PARAMETERS:
+ *  void *parameters
+ *    - Parameters
+ *
+ * RETURNS:
+ *  N/A
+ */
+void scheduler( void * );
 
 /*
  * Redirects the printf() output to the serial window in the Keil simulator
@@ -61,6 +87,7 @@ unsigned long ulTaskNumber[ configEXPECTED_NO_RUNNING_TASKS ];
 int main( void )
 {
 	// Create 4 tasks
+	xTaskCreate( scheduler, "scheduler", configMINIMAL_STACK_SIZE, NULL, SCHEDULER_PRIORITY, NULL );
 	xTaskCreate( task, "task1", configMINIMAL_STACK_SIZE, NULL, TASK_PRIORITY, NULL );
 	xTaskCreate( task, "task2", configMINIMAL_STACK_SIZE, NULL, TASK_PRIORITY, NULL );
 	xTaskCreate( task, "task3", configMINIMAL_STACK_SIZE, NULL, TASK_PRIORITY, NULL );
@@ -73,15 +100,16 @@ int main( void )
 	return 0;
 }
 
+void scheduler( void *parameters )
+{
+
+}
+
 void task( void *parameters )
 {
 	for( ;; );
 }
 
-/*
- * Redirects the printf() output to the serial window in the Keil simulator
- * IDE.
- */
 int fputc( int iChar, FILE *pxNotUsed )
 {
 	/* Just to avoid compiler warnings. */
