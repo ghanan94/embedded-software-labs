@@ -52,6 +52,8 @@ static void block_task( xListItem *task )
 	tcb->wake_up_time = listGET_LIST_ITEM_VALUE( task );
 
 	// This task should be prepped to start again after a period of waking up.
+	// Since the task should start again at this time, it is also the deadline
+	// for the next execution.
 	listSET_LIST_ITEM_VALUE( task, tcb->wake_up_time + tcb->period );
 
 	// Reset elapsed time.
@@ -105,7 +107,16 @@ static void resume_task( xListItem *task )
  */
 static xListItem* get_next_task()
 {
-	return 0;
+	if ( listLIST_IS_EMPTY( &ready_list ) )
+	{
+		return 0;
+	}
+
+	// Must do the previous of the last item because in xLists, the last item
+	// is just a marker. The xListEnd item is just a random listitem that
+	// holds the highest value. The item we are looking for is right before
+	// this.
+	return ( xListItem * )ready_list.xListEnd.pxPrevious;
 }
 
 /*
@@ -190,6 +201,11 @@ static void edf_scheduler( void *parameters )
 		}
 
 		current_task = get_next_task();
+
+		if ( current_task )
+		{
+			resume_task( current_task );
+		}
 
 		// Block scheduler until next period.
 		vTaskDelayUntil( &next_wake_time, SCHEDULER_PERIOD );
