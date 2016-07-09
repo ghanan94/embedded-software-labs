@@ -109,7 +109,7 @@ This demo is expected to create three tasks - an Rx task, a Tx task and the
 idle task.  This constant is used to dimension an array which is used to trace
 which task is running when for viewing on the logic analyzer window in the Keil
 simulator IDE. */
-#define configEXPECTED_NO_RUNNING_TASKS		( 3 )
+#define configEXPECTED_NO_RUNNING_TASKS		( 5 )
 extern unsigned long ulTaskNumber[];
 #define traceTASK_SWITCHED_IN() 	ulTaskNumber[ pxCurrentTCB->uxTCBNumber ] = 1
 #define traceTASK_SWITCHED_OUT() 	ulTaskNumber[ pxCurrentTCB->uxTCBNumber ] = 0

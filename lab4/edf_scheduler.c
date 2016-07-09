@@ -1,4 +1,5 @@
 #include "edf_scheduler.h"
+#include <stdio.h>
 
 /*
  * ****list.h did not implement a getter for owner so implemented here.*****
@@ -90,6 +91,8 @@ static void resume_task( xListItem *task )
 	tcb->elapsed_time += SCHEDULER_PERIOD;
 
 	vTaskResume( tcb->handle );
+
+	printf("Task #%d\n", tcb->id);
 }
 
 /*
@@ -178,6 +181,8 @@ static void edf_scheduler( void *parameters )
 
 	for( ;; )
 	{
+		printf("Scheduler [%d]\n", next_wake_time);
+
 		// Check to see if tasks that are currently blocked should be
 		// unblocked.
 		check_blocked_tasks();
