@@ -170,6 +170,47 @@ void block_task( xListItem *task )
 {
 	struct tcb *tcb = ( struct tcb * )_listGET_LIST_ITEM_OWNER( current_task );
 	vTaskSuspend( tcb->handle );
+
+	// Set the wake up time.
+	tcb->wake_up_time = listGET_LIST_ITEM_VALUE( task );
+
+	// This task should be prepped to start again after a period of waking up.
+	listSET_LIST_ITEM_VALUE( task, tcb->wake_up_time + tcb->period );
+
+	// Reset elapsed time.
+	tcb->elapsed_time = 0;
+
+	// Add task to the blocked state.
+	vListInsert( &blocked_list, task );
+}
+
+/*
+ * NAME:          resume_task
+ *
+ * DESCRIPTION:   Resume a task and increment it's elapsed time by the
+ *                scheduler period, as after the scheduler runs again, it is
+ *                not guaranteed that the task may continue to run (another task
+ *                may then be set to run.
+ *
+ * PARAMETERS:
+ *  struct task_info *task
+ *    - A Task.
+ *
+ * RETURNS:
+ *  N/A
+ */
+void resume_task( xListItem *task )
+{
+	struct tcb *tcb = ( struct tcb * )_listGET_LIST_ITEM_OWNER( current_task );
+
+	// If the task is in a list, remove it from that list.
+	// (vListRemove will get the list that the task is in and then remove it).
+	vListRemove( task );
+
+	// Increment elapsed time
+	tcb->elapsed_time += SCHEDULER_PERIOD;
+
+	vTaskResume( tcb->handle );
 }
 
 /*
