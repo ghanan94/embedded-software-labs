@@ -222,7 +222,7 @@ static void edf_scheduler( void *parameters )
 		{
 			struct tcb *tcb = ( struct tcb * )_listGET_LIST_ITEM_OWNER( current_task );
 
-			if ( tcb->elapsed_time + SCHEDULER_PERIOD >= tcb->execution_time )
+			if ( tcb->elapsed_time  >= tcb->execution_time )
 			{
 				// Current task has completed executing.
 				block_task( current_task );
