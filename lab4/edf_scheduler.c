@@ -270,6 +270,9 @@ void initialize_task( xListItem *list_item, struct tcb *tcb, unsigned int id, un
 
 	// Add task to ready list.
 	vListInsert( &ready_list, list_item );
+
+	// Initially, task should be in a suspended state.
+	vTaskSuspend( tcb->handle );
 }
 
 /*

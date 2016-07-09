@@ -99,15 +99,15 @@ int main( void )
 {
 	initialize_edf_scheduler(SCHEDULER_PRIORITY);
 
-	// Initialize task info for each of the tasks.
-	initialize_task( &list_items[0], &tcbs[0], 0, TASK0_EXECUTION_TIME, TASK0_PERIOD );
-	initialize_task( &list_items[1], &tcbs[1], 1, TASK1_EXECUTION_TIME, TASK1_PERIOD );
-	initialize_task( &list_items[2], &tcbs[2], 2, TASK2_EXECUTION_TIME, TASK2_PERIOD );
-
 	// Create 3 tasks.
 	xTaskCreate( task, "task0", configMINIMAL_STACK_SIZE, NULL, TASK_PRIORITY, &tcbs[0].handle );
 	xTaskCreate( task, "task1", configMINIMAL_STACK_SIZE, NULL, TASK_PRIORITY, &tcbs[1].handle );
 	xTaskCreate( task, "task2", configMINIMAL_STACK_SIZE, NULL, TASK_PRIORITY, &tcbs[2].handle );
+
+	// Initialize task info for each of the tasks.
+	initialize_task( &list_items[0], &tcbs[0], 0, TASK0_EXECUTION_TIME, TASK0_PERIOD );
+	initialize_task( &list_items[1], &tcbs[1], 1, TASK1_EXECUTION_TIME, TASK1_PERIOD );
+	initialize_task( &list_items[2], &tcbs[2], 2, TASK2_EXECUTION_TIME, TASK2_PERIOD );
 
 	vTaskStartScheduler();
 
