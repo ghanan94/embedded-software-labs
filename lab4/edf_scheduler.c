@@ -110,16 +110,47 @@ static void resume_task( xListItem *task )
  */
 static xListItem* get_next_task()
 {
+	int i;
+	volatile xListItem *list_item;
+	xListItem *next_list_item;
+
 	if ( listLIST_IS_EMPTY( &ready_list ) )
 	{
 		return 0;
 	}
 
-	// Must do the previous of the last item because in xLists, the last item
-	// is just a marker. The xListEnd item is just a random listitem that
-	// holds the highest value. The item we are looking for is right before
-	// this.
-	return ( xListItem * )ready_list.xListEnd.pxPrevious;
+	// xList stores a pointer to the tail (xListEnd), which holds a pointer
+	// back to the beginning (pxNext). (Circular array/buffer).
+	list_item = ready_list.xListEnd.pxNext;
+	next_list_item = ( xListItem * )list_item;
+
+	// xList is sorted in ascending order by list item Value, so we only
+	// neex to check the first item. However, if the first item and second item
+	// have the same deadline, use the order T1 > T2 > T3 to break the tie.
+	for ( i = listCURRENT_LIST_LENGTH( &ready_list ); i != 0; --i )
+	{
+		if ( listGET_LIST_ITEM_VALUE( list_item ) == listGET_LIST_ITEM_VALUE( next_list_item ) )
+		{
+			struct tcb *tcb_li = ( struct tcb * )_listGET_LIST_ITEM_OWNER( list_item );
+			struct tcb *tcb_nli = ( struct tcb * )_listGET_LIST_ITEM_OWNER( next_list_item );
+
+			if ( tcb_li->id < tcb_nli->id )
+			{
+				next_list_item = ( xListItem * )list_item;
+			}
+
+		}
+		else
+		{
+			// Once the value changes, we know the value increased, so we
+			// break and do the task with the earliest deadline
+			break;
+		}
+
+		list_item = list_item->pxNext;
+	}
+
+	return next_list_item;
 }
 
 /*

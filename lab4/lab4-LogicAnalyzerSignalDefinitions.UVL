@@ -1,0 +1,55 @@
+[Signal 1]
+DispName=ulTaskNumber[0]
+PlotType=1
+Color=255
+ValHex=0
+MinDec=0
+MinVal=0.
+MaxDec=0
+MaxVal=1.
+Mask=-1
+Offset=0
+[Signal 2]
+DispName=ulTaskNumber[1]
+PlotType=1
+Color=32768
+ValHex=0
+MinDec=0
+MinVal=0.
+MaxDec=0
+MaxVal=1.
+Mask=0
+Offset=0
+[Signal 3]
+DispName=ulTaskNumber[2]
+PlotType=1
+Color=8388608
+ValHex=0
+MinDec=0
+MinVal=0.
+MaxDec=0
+MaxVal=1.
+Mask=1
+Offset=0
+[Signal 4]
+DispName=ulTaskNumber[3]
+PlotType=1
+Color=0
+ValHex=0
+MinDec=0
+MinVal=0.
+MaxDec=0
+MaxVal=4294967295.
+Mask=0
+Offset=0
+[Signal 5]
+DispName=ulTaskNumber[4]
+PlotType=1
+Color=33023
+ValHex=0
+MinDec=0
+MinVal=0.
+MaxDec=0
+MaxVal=4294967295.
+Mask=0
+Offset=0
