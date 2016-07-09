@@ -406,6 +406,11 @@
               <FileType>5</FileType>
               <FilePath>.\FreeRTOSConfig.h</FilePath>
             </File>
+            <File>
+              <FileName>edf_scheduler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\edf_scheduler.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
