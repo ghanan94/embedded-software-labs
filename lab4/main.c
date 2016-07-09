@@ -1,10 +1,12 @@
 /* Kernel includes. */
 #include "FreeRTOS.h"
 #include "task.h"
-// #include "list.h" // This is included in tash.h already
+#include "list.h"
 
 /* Standard include. */
 #include <stdio.h>
+
+#include "edf_scheduler.h"
 
 /* The ITM port is used to direct the printf() output to the serial window in
 the Keil simulator IDE. */
@@ -38,30 +40,6 @@ the Keil simulator IDE. */
 #define TASK0_PERIOD         (4000 / portTICK_RATE_MS) // 4 s before restarting
 #define TASK1_PERIOD         (6000 / portTICK_RATE_MS) // 6 s before restarting
 #define TASK2_PERIOD         (8000 / portTICK_RATE_MS) // 8 s before restarting
-#define SCHEDULER_PERIOD     (1000 / portTICK_RATE_MS) // 1 s before restarting
-
-/*
- * ****list.h did not implement a getter for owner so implemented here.*****
- * Access macro the retrieve the ownder of the list item.  The owner of a list
- * item is the object (usually a TCB) that contains the list item.
- *
- * \page listGET_LIST_ITEM_VALUE listGET_LIST_ITEM_VALUE
- * \ingroup LinkedList
- */
-#define _listGET_LIST_ITEM_OWNER( pxListItem ) (( pxListItem )->pvOwner)
-/*-----------------------------------------------------------*/
-
-/*
- * Task Control Buffer.
- */
-struct tcb {
-	unsigned int id;
-	unsigned int execution_time;
-	unsigned int period;
-	unsigned int elapsed_time;
-	unsigned int wake_up_time;
-	xTaskHandle handle;
-};
 /*-----------------------------------------------------------*/
 
 /*
@@ -73,22 +51,6 @@ struct tcb tcbs[NUM_TASKS];
  * Array to keep track of task list items.
  */
 xListItem list_items[NUM_TASKS];
-
-/*
- * Pointer to current task's list item.
- */
-xListItem *current_task;
-
-/*
- * List to keep track of tasks that are ready to execute.
- */
-xList ready_list;
-
-/*
- * List to keep track of tasks that are not ready to execute (wakting for a
- * wake up time to pass).
- */
-xList blocked_list;
 
 /* One array position is used for each task created by this demo.  The
 variables in this array are set and cleared by the trace macros within
@@ -117,142 +79,6 @@ int fputc( int iChar, FILE *pxNotUsed )
 }
 
 /*
- * NAME:          initialize_task_info
- *
- * DESCRIPTION:   Initialize task info for a task.
- *
- * PARAMETERS:
- *  xListItem *list_item
- *    - Pointer to a xListItem.
- *  struct task_info *task_info
- *    - Pointer to a task_info struct.
- *  unsigned int id
- *    - ID for a task.
- *  unsigned int execution_time
- *    - Execution time of a task.
- *  unsigned int period
- *    - Period (time between restarting) of a task.
- *
- * RETURNS:
- *  N/A
- */
-void initialize_task( xListItem *list_item, struct tcb *tcb, unsigned int id, unsigned int execution_time, unsigned int period)
-{
-	tcb->id = id;
-	tcb->execution_time = execution_time;
-	tcb->period = period;
-	tcb->elapsed_time = 0;
-	tcb->wake_up_time = 0;
-
-	// Initialize the list item before using it.
-	vListInitialiseItem( list_item );
-
-	// ListItem Owner is used to hold the tcb details.
-	listSET_LIST_ITEM_OWNER( list_item, tcb );
-
-	// ListItem Value is used to hold the time when task should be unblocked.
-	listSET_LIST_ITEM_VALUE( list_item, period );
-}
-
-/*
- * NAME:          block_task
- *
- * DESCRIPTION:   Block a task (suspend it and add to bloacked list).
- *
- * PARAMETERS:
- *  struct task_info *task
- *    - A Task.
- *
- * RETURNS:
- *  N/A
- */
-void block_task( xListItem *task )
-{
-	struct tcb *tcb = ( struct tcb * )_listGET_LIST_ITEM_OWNER( current_task );
-	vTaskSuspend( tcb->handle );
-
-	// Set the wake up time.
-	tcb->wake_up_time = listGET_LIST_ITEM_VALUE( task );
-
-	// This task should be prepped to start again after a period of waking up.
-	listSET_LIST_ITEM_VALUE( task, tcb->wake_up_time + tcb->period );
-
-	// Reset elapsed time.
-	tcb->elapsed_time = 0;
-
-	// Add task to the blocked state.
-	vListInsert( &blocked_list, task );
-}
-
-/*
- * NAME:          resume_task
- *
- * DESCRIPTION:   Resume a task and increment it's elapsed time by the
- *                scheduler period, as after the scheduler runs again, it is
- *                not guaranteed that the task may continue to run (another task
- *                may then be set to run.
- *
- * PARAMETERS:
- *  struct task_info *task
- *    - A Task.
- *
- * RETURNS:
- *  N/A
- */
-void resume_task( xListItem *task )
-{
-	struct tcb *tcb = ( struct tcb * )_listGET_LIST_ITEM_OWNER( current_task );
-
-	// If the task is in a list, remove it from that list.
-	// (vListRemove will get the list that the task is in and then remove it).
-	vListRemove( task );
-
-	// Increment elapsed time
-	tcb->elapsed_time += SCHEDULER_PERIOD;
-
-	vTaskResume( tcb->handle );
-}
-
-/*
- * NAME:          scheduler
- *
- * DESCRIPTION:   EDF Scheduler.
- *
- * PARAMETERS:
- *  void *parameters
- *    - Parameters
- *
- * RETURNS:
- *  N/A
- */
-void scheduler( void *parameters )
-{
-	/* Initialise xNextWakeTime - this only needs to be done once. */
-	portTickType next_wake_time = xTaskGetTickCount();
-
-	for( ;; )
-	{
-		if ( current_task )
-		{
-			struct tcb *tcb = ( struct tcb * )_listGET_LIST_ITEM_OWNER( current_task );
-
-			if ( tcb->elapsed_time + SCHEDULER_PERIOD >= tcb->execution_time )
-			{
-				// Current task has completed executing.
-				block_task( current_task );
-			}
-			else
-			{
-
-			}
-		}
-
-		// Block scheduler until next period.
-		vTaskDelayUntil( &next_wake_time, SCHEDULER_PERIOD );
-	}
-}
-
-/*
  * NAME:          task
  *
  * DESCRIPTION:   A simple function to simulate a working task (endless loop).
@@ -271,22 +97,17 @@ void task( void *parameters )
 
 int main( void )
 {
-	// Intially no task running.
-	current_task = 0;
+	initialize_edf_scheduler(SCHEDULER_PRIORITY);
 
 	// Initialize task info for each of the tasks.
 	initialize_task( &list_items[0], &tcbs[0], 0, TASK0_EXECUTION_TIME, TASK0_PERIOD );
 	initialize_task( &list_items[1], &tcbs[1], 1, TASK1_EXECUTION_TIME, TASK1_PERIOD );
 	initialize_task( &list_items[2], &tcbs[2], 2, TASK2_EXECUTION_TIME, TASK2_PERIOD );
 
-	// Create 3 tasks and a scheduler task.
-	xTaskCreate( scheduler, "scheduler", configMINIMAL_STACK_SIZE, NULL, SCHEDULER_PRIORITY, NULL );
+	// Create 3 tasks.
 	xTaskCreate( task, "task0", configMINIMAL_STACK_SIZE, NULL, TASK_PRIORITY, &tcbs[0].handle );
 	xTaskCreate( task, "task1", configMINIMAL_STACK_SIZE, NULL, TASK_PRIORITY, &tcbs[1].handle );
 	xTaskCreate( task, "task2", configMINIMAL_STACK_SIZE, NULL, TASK_PRIORITY, &tcbs[2].handle );
-
-	vListInitialise( &ready_list );
-	vListInitialise( &blocked_list );
 
 	vTaskStartScheduler();
 
