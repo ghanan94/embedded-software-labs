@@ -91,6 +91,64 @@ static void resume_task( xListItem *task )
 }
 
 /*
+ * NAME:          get_next_task
+ *
+ * DESCRIPTION:   Get the next task that should be executed as per EDF
+ *                Scheduler.
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  xListItem *next_current_task
+ *    - Pointer to the task that should be executed in the next slot.
+ */
+static xListItem* get_next_task()
+{
+	return 0;
+}
+
+/*
+ * NAME:          check_blocked_tasks
+ *
+ * DESCRIPTION:   Check the blocked list and see if any task can be unblocked.
+ *
+ * PARAMETERS:
+ *  N/A
+ *
+ * RETURNS:
+ *  N/A
+ */
+static void check_blocked_tasks()
+{
+	int i;
+	volatile xListItem *list_item;
+	portTickType tick_count;
+
+	tick_count = xTaskGetTickCount();
+
+	// xList stores a pointer to the tail (xListEnd), which holds a pointer
+	// back to the beginning (pxNext). (Circular array/buffer).
+	list_item = blocked_list.xListEnd.pxNext;
+
+	for ( i = listCURRENT_LIST_LENGTH( &blocked_list ); i != 0; --i )
+	{
+		struct tcb *tcb = ( struct tcb * )_listGET_LIST_ITEM_OWNER( list_item );
+
+		if ( tcb->wake_up_time <= tick_count )
+		{
+			// It is currently task's wake up time, or it has passed.
+			// So put it into the ready list now.
+			// Must cast to non-volatile xListItem* first
+			vListRemove( ( xListItem * )list_item );
+			vListInsert( &ready_list, ( xListItem * )list_item );
+		}
+
+		list_item = list_item->pxNext;
+	}
+}
+
+/*
  * NAME:          edf_scheduler
  *
  * DESCRIPTION:   EDF Scheduler.
@@ -109,6 +167,10 @@ static void edf_scheduler( void *parameters )
 
 	for( ;; )
 	{
+		// Check to see if tasks that are currently blocked should be
+		// unblocked.
+		check_blocked_tasks();
+
 		if ( current_task )
 		{
 			struct tcb *tcb = ( struct tcb * )_listGET_LIST_ITEM_OWNER( current_task );
@@ -120,9 +182,14 @@ static void edf_scheduler( void *parameters )
 			}
 			else
 			{
-
+				// Task needs to continue to be done, but suspend it for now
+				// so other running tasks have a change at executing aswell.
+				vTaskSuspend( tcb->handle );
+				vListInsert ( &ready_list, current_task );
 			}
 		}
+
+		current_task = get_next_task();
 
 		// Block scheduler until next period.
 		vTaskDelayUntil( &next_wake_time, SCHEDULER_PERIOD );
