@@ -82,7 +82,7 @@
 #define configUSE_RECURSIVE_MUTEXES		0
 #define configCHECK_FOR_STACK_OVERFLOW	0
 
-#define configMAX_PRIORITIES			( ( unsigned portBASE_TYPE ) 5 )
+#define configMAX_PRIORITIES			( 5 )
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
 #define configQUEUE_REGISTRY_SIZE		0
 
@@ -113,5 +113,10 @@ simulator IDE. */
 extern unsigned long ulTaskNumber[];
 #define traceTASK_SWITCHED_IN() 	ulTaskNumber[ pxCurrentTCB->uxTCBNumber ] = 1
 #define traceTASK_SWITCHED_OUT() 	ulTaskNumber[ pxCurrentTCB->uxTCBNumber ] = 0
+
+/*
+ * Use the Cortex-M3 optimisations, rather than the generic C implementation.
+ */
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
 
 #endif /* FREERTOS_CONFIG_H */

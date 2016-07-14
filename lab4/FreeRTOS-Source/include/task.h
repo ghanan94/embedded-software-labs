@@ -1,38 +1,38 @@
 /*
-    FreeRTOS V6.1.0 - Copyright (C) 2010 Real Time Engineers Ltd.
+    FreeRTOS V7.2.0 - Copyright (C) 2012 Real Time Engineers Ltd.
+
 
     ***************************************************************************
-    *                                                                         *
-    * If you are:                                                             *
-    *                                                                         *
-    *    + New to FreeRTOS,                                                   *
-    *    + Wanting to learn FreeRTOS or multitasking in general quickly       *
-    *    + Looking for basic training,                                        *
-    *    + Wanting to improve your FreeRTOS skills and productivity           *
-    *                                                                         *
-    * then take a look at the FreeRTOS books - available as PDF or paperback  *
-    *                                                                         *
-    *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
-    *                  http://www.FreeRTOS.org/Documentation                  *
-    *                                                                         *
-    * A pdf reference manual is also available.  Both are usually delivered   *
-    * to your inbox within 20 minutes to two hours when purchased between 8am *
-    * and 8pm GMT (although please allow up to 24 hours in case of            *
-    * exceptional circumstances).  Thank you for your support!                *
-    *                                                                         *
+     *                                                                       *
+     *    FreeRTOS tutorial books are available in pdf and paperback.        *
+     *    Complete, revised, and edited pdf reference manuals are also       *
+     *    available.                                                         *
+     *                                                                       *
+     *    Purchasing FreeRTOS documentation will not only help you, by       *
+     *    ensuring you get running as quickly as possible and with an        *
+     *    in-depth knowledge of how to use FreeRTOS, it will also help       *
+     *    the FreeRTOS project to continue with its mission of providing     *
+     *    professional grade, cross platform, de facto standard solutions    *
+     *    for microcontrollers - completely free of charge!                  *
+     *                                                                       *
+     *    >>> See http://www.FreeRTOS.org/Documentation for details. <<<     *
+     *                                                                       *
+     *    Thank you for using FreeRTOS, and thank you for your support!      *
+     *                                                                       *
     ***************************************************************************
+
 
     This file is part of the FreeRTOS distribution.
 
     FreeRTOS is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License (version 2) as published by the
     Free Software Foundation AND MODIFIED BY the FreeRTOS exception.
-    ***NOTE*** The exception to the GPL is included to allow you to distribute
-    a combined work that includes FreeRTOS without being obliged to provide the
-    source code for proprietary components outside of the FreeRTOS kernel.
-    FreeRTOS is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+    >>>NOTE<<< The modification to the GPL is included to allow you to
+    distribute a combined work that includes FreeRTOS without being obliged to
+    provide the source code for proprietary components outside of the FreeRTOS
+    kernel.  FreeRTOS is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
     more details. You should have received a copy of the GNU General Public
     License and the FreeRTOS license exception along with FreeRTOS; if not it
     can be viewed here: http://www.freertos.org/a00114.html and also obtained
@@ -41,25 +41,37 @@
 
     1 tab == 4 spaces!
 
-    http://www.FreeRTOS.org - Documentation, latest information, license and
-    contact details.
+	
+    ***************************************************************************
+     *                                                                       *
+     *    Having a problem?  Start by reading the FAQ "My application does   *
+	 *    not run, what could be wrong?                                      *
+	 *                                                                       *
+	 *    http://www.FreeRTOS.org/FAQHelp.html                               *
+	 *                                                                       *
+    ***************************************************************************
 
-    http://www.SafeRTOS.com - A version that is certified for use in safety
-    critical systems.
+	
+    http://www.FreeRTOS.org - Documentation, training, latest information, 
+    license and contact details.
+	
+	http://www.FreeRTOS.org/plus - Selection of FreeRTOS ecosystem products,
+	including FreeRTOS+Trace - an indispensable productivity tool.
 
-    http://www.OpenRTOS.com - Commercial support, development, porting,
-    licensing and training services.
+	Real Time Engineers ltd license FreeRTOS to High Integrity Systems, who sell 
+	the code with commercial support, indemnification, and middleware, under 
+	the OpenRTOS brand:  http://www.OpenRTOS.com.  High Integrity Systems also
+	provide a safety engineered and independently SIL3 certified version under 
+	the	SafeRTOS brand: http://www.SafeRTOS.com.
 */
-
-
-#ifndef INC_FREERTOS_H
-	#error "#include FreeRTOS.h" must appear in source files before "#include task.h"
-#endif
-
 
 
 #ifndef TASK_H
 #define TASK_H
+
+#ifndef INC_FREERTOS_H
+	#error "include FreeRTOS.h must appear in source files before include task.h"
+#endif
 
 #include "portable.h"
 #include "list.h"
@@ -72,7 +84,7 @@ extern "C" {
  * MACROS AND DEFINITIONS
  *----------------------------------------------------------*/
 
-#define tskKERNEL_VERSION_NUMBER "V6.1.0"
+#define tskKERNEL_VERSION_NUMBER "V7.2.0"
 
 /**
  * task. h
@@ -119,12 +131,22 @@ typedef struct xTASK_PARAMTERS
 	xMemoryRegion xRegions[ portNUM_CONFIGURABLE_REGIONS ];
 } xTaskParameters;
 
+/* Task states returned by eTaskStateGet. */
+typedef enum
+{
+	eRunning = 0,	/* A task is querying the state of itself, so must be running. */
+	eReady,			/* The task being queried is in a read or pending ready list. */
+	eBlocked,		/* The task being queried is in the Blocked state. */
+	eSuspended,		/* The task being queried is in the Suspended state, or is in the Blocked state with an infinite time out. */
+	eDeleted		/* The task being queried has been deleted, but its TCB has not yet been freed. */
+} eTaskState;
+
 /*
  * Defines the priority used by the idle task.  This must not be modified.
  *
  * \ingroup TaskUtils
  */
-#define tskIDLE_PRIORITY			( ( unsigned portBASE_TYPE ) 0 )
+#define tskIDLE_PRIORITY			( ( unsigned portBASE_TYPE ) 0U )
 
 /**
  * task. h
@@ -427,8 +449,7 @@ void vTaskAllocateMPURegions( xTaskHandle xTask, const xMemoryRegion * const pxR
  * \defgroup vTaskDelete vTaskDelete
  * \ingroup Tasks
  */
-void vTaskDelete( xTaskHandle pxTask ) PRIVILEGED_FUNCTION;
-
+void vTaskDelete( xTaskHandle pxTaskToDelete ) PRIVILEGED_FUNCTION;
 
 /*-----------------------------------------------------------
  * TASK CONTROL API
@@ -589,6 +610,24 @@ void vTaskDelayUntil( portTickType * const pxPreviousWakeTime, portTickType xTim
  * \ingroup TaskCtrl
  */
 unsigned portBASE_TYPE uxTaskPriorityGet( xTaskHandle pxTask ) PRIVILEGED_FUNCTION;
+
+/**
+ * task. h
+ * <pre>eTaskState eTaskStateGet( xTaskHandle pxTask );</pre>
+ *
+ * INCLUDE_eTaskStateGet must be defined as 1 for this function to be available.
+ * See the configuration section for more information.
+ *
+ * Obtain the state of any task.  States are encoded by the eTaskState 
+ * enumerated type.
+ *
+ * @param pxTask Handle of the task to be queried.
+ *
+ * @return The state of pxTask at the time the function was called.  Note the
+ * state of the task might change between the function being called, and the
+ * functions return value being tested by the calling task.
+ */
+eTaskState eTaskStateGet( xTaskHandle pxTask ) PRIVILEGED_FUNCTION;
 
 /**
  * task. h
@@ -1004,6 +1043,20 @@ unsigned portBASE_TYPE uxTaskGetNumberOfTasks( void ) PRIVILEGED_FUNCTION;
 
 /**
  * task. h
+ * <PRE>signed char *pcTaskGetTaskName( xTaskHandle xTaskToQuery );</PRE>
+ *
+ * @return The text (human readable) name of the task referenced by the handle
+ * xTaskToQueury.  A task can query its own name by either passing in its own
+ * handle, or by setting xTaskToQuery to NULL.  INCLUDE_pcTaskGetTaskName must be
+ * set to 1 in FreeRTOSConfig.h for pcTaskGetTaskName() to be available.
+ *
+ * \page pcTaskGetTaskName pcTaskGetTaskName
+ * \ingroup TaskUtils
+ */
+signed char *pcTaskGetTaskName( xTaskHandle xTaskToQuery );
+
+/**
+ * task. h
  * <PRE>void vTaskList( char *pcWriteBuffer );</PRE>
  *
  * configUSE_TRACE_FACILITY must be defined as 1 for this function to be
@@ -1061,40 +1114,6 @@ void vTaskList( signed char *pcWriteBuffer ) PRIVILEGED_FUNCTION;
 void vTaskGetRunTimeStats( signed char *pcWriteBuffer ) PRIVILEGED_FUNCTION;
 
 /**
- * task. h
- * <PRE>void vTaskStartTrace( char * pcBuffer, unsigned portBASE_TYPE uxBufferSize );</PRE>
- *
- * Starts a real time kernel activity trace.  The trace logs the identity of
- * which task is running when.
- *
- * The trace file is stored in binary format.  A separate DOS utility called
- * convtrce.exe is used to convert this into a tab delimited text file which
- * can be viewed and plotted in a spread sheet.
- *
- * @param pcBuffer The buffer into which the trace will be written.
- *
- * @param ulBufferSize The size of pcBuffer in bytes.  The trace will continue
- * until either the buffer in full, or ulTaskEndTrace () is called.
- *
- * \page vTaskStartTrace vTaskStartTrace
- * \ingroup TaskUtils
- */
-void vTaskStartTrace( signed char * pcBuffer, unsigned long ulBufferSize ) PRIVILEGED_FUNCTION;
-
-/**
- * task. h
- * <PRE>unsigned long ulTaskEndTrace( void );</PRE>
- *
- * Stops a kernel activity trace.  See vTaskStartTrace ().
- *
- * @return The number of bytes that have been written into the trace buffer.
- *
- * \page usTaskEndTrace usTaskEndTrace
- * \ingroup TaskUtils
- */
-unsigned long ulTaskEndTrace( void ) PRIVILEGED_FUNCTION;
-
-/**
  * task.h
  * <PRE>unsigned portBASE_TYPE uxTaskGetStackHighWaterMark( xTaskHandle xTask );</PRE>
  *
@@ -1102,9 +1121,9 @@ unsigned long ulTaskEndTrace( void ) PRIVILEGED_FUNCTION;
  * this function to be available.
  *
  * Returns the high water mark of the stack associated with xTask.  That is,
- * the minimum free stack space there has been (in bytes) since the task
- * started.  The smaller the returned number the closer the task has come
- * to overflowing its stack.
+ * the minimum free stack space there has been (in words, so on a 32 bit machine
+ * a value of 1 means 4 bytes) since the task started.  The smaller the returned
+ * number the closer the task has come to overflowing its stack.
  *
  * @param xTask Handle of the task associated with the stack to be checked.
  * Set xTask to NULL to check the stack of the calling task.
@@ -1114,23 +1133,33 @@ unsigned long ulTaskEndTrace( void ) PRIVILEGED_FUNCTION;
  */
 unsigned portBASE_TYPE uxTaskGetStackHighWaterMark( xTaskHandle xTask ) PRIVILEGED_FUNCTION;
 
-/**
- * task.h
- * <pre>void vTaskSetApplicationTaskTag( xTaskHandle xTask, pdTASK_HOOK_CODE pxHookFunction );</pre>
- *
- * Sets pxHookFunction to be the task hook function used by the task xTask.
- * Passing xTask as NULL has the effect of setting the calling tasks hook
- * function.
- */
-void vTaskSetApplicationTaskTag( xTaskHandle xTask, pdTASK_HOOK_CODE pxHookFunction ) PRIVILEGED_FUNCTION;
+/* When using trace macros it is sometimes necessary to include tasks.h before
+FreeRTOS.h.  When this is done pdTASK_HOOK_CODE will not yet have been defined,
+so the following two prototypes will cause a compilation error.  This can be
+fixed by simply guarding against the inclusion of these two prototypes unless
+they are explicitly required by the configUSE_APPLICATION_TASK_TAG configuration
+constant. */
+#ifdef configUSE_APPLICATION_TASK_TAG
+	#if configUSE_APPLICATION_TASK_TAG == 1
+		/**
+		 * task.h
+		 * <pre>void vTaskSetApplicationTaskTag( xTaskHandle xTask, pdTASK_HOOK_CODE pxHookFunction );</pre>
+		 *
+		 * Sets pxHookFunction to be the task hook function used by the task xTask.
+		 * Passing xTask as NULL has the effect of setting the calling tasks hook
+		 * function.
+		 */
+		void vTaskSetApplicationTaskTag( xTaskHandle xTask, pdTASK_HOOK_CODE pxHookFunction ) PRIVILEGED_FUNCTION;
 
-/**
- * task.h
- * <pre>void xTaskGetApplicationTaskTag( xTaskHandle xTask );</pre>
- *
- * Returns the pxHookFunction value assigned to the task xTask.
- */
-pdTASK_HOOK_CODE xTaskGetApplicationTaskTag( xTaskHandle xTask ) PRIVILEGED_FUNCTION;
+		/**
+		 * task.h
+		 * <pre>void xTaskGetApplicationTaskTag( xTaskHandle xTask );</pre>
+		 *
+		 * Returns the pxHookFunction value assigned to the task xTask.
+		 */
+		pdTASK_HOOK_CODE xTaskGetApplicationTaskTag( xTaskHandle xTask ) PRIVILEGED_FUNCTION;
+	#endif /* configUSE_APPLICATION_TASK_TAG ==1 */
+#endif /* ifdef configUSE_APPLICATION_TASK_TAG */
 
 /**
  * task.h
@@ -1144,6 +1173,14 @@ pdTASK_HOOK_CODE xTaskGetApplicationTaskTag( xTaskHandle xTask ) PRIVILEGED_FUNC
  */
 portBASE_TYPE xTaskCallApplicationTaskHook( xTaskHandle xTask, void *pvParameter ) PRIVILEGED_FUNCTION;
 
+/**
+ * xTaskGetIdleTaskHandle() is only available if 
+ * INCLUDE_xTaskGetIdleTaskHandle is set to 1 in FreeRTOSConfig.h.
+ *
+ * Simply returns the handle of the idle task.  It is not valid to call
+ * xTaskGetIdleTaskHandle() before the scheduler has been started.
+ */
+xTaskHandle xTaskGetIdleTaskHandle( void );
 
 /*-----------------------------------------------------------
  * SCHEDULER INTERNALS AVAILABLE FOR PORTING PURPOSES
@@ -1190,6 +1227,21 @@ void vTaskPlaceOnEventList( const xList * const pxEventList, portTickType xTicks
  *
  * THIS FUNCTION MUST BE CALLED WITH INTERRUPTS DISABLED.
  *
+ * This function performs nearly the same function as vTaskPlaceOnEventList().
+ * The difference being that this function does not permit tasks to block
+ * indefinitely, whereas vTaskPlaceOnEventList() does.
+ *
+ * @return pdTRUE if the task being removed has a higher priority than the task
+ * making the call, otherwise pdFALSE.
+ */
+void vTaskPlaceOnEventListRestricted( const xList * const pxEventList, portTickType xTicksToWait ) PRIVILEGED_FUNCTION;
+
+/*
+ * THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
+ * INTERFACE WHICH IS FOR THE EXCLUSIVE USE OF THE SCHEDULER.
+ *
+ * THIS FUNCTION MUST BE CALLED WITH INTERRUPTS DISABLED.
+ *
  * Removes a task from both the specified event list and the list of blocked
  * tasks, and places it on a ready queue.
  *
@@ -1200,19 +1252,6 @@ void vTaskPlaceOnEventList( const xList * const pxEventList, portTickType xTicks
  * making the call, otherwise pdFALSE.
  */
 signed portBASE_TYPE xTaskRemoveFromEventList( const xList * const pxEventList ) PRIVILEGED_FUNCTION;
-
-/*
- * THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
- * INTERFACE WHICH IS FOR THE EXCLUSIVE USE OF THE SCHEDULER.
- *
- * INCLUDE_vTaskCleanUpResources and INCLUDE_vTaskSuspend must be defined as 1
- * for this function to be available.
- * See the configuration section for more information.
- *
- * Empties the ready and delayed queues of task control blocks, freeing the
- * memory allocated for the task control block and task stacks as it goes.
- */
-void vTaskCleanUpResources( void ) PRIVILEGED_FUNCTION;
 
 /*
  * THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS ONLY
@@ -1268,7 +1307,19 @@ void vTaskPriorityDisinherit( xTaskHandle * const pxMutexHolder ) PRIVILEGED_FUN
  * Generic version of the task creation function which is in turn called by the
  * xTaskCreate() and xTaskCreateRestricted() macros.
  */
-signed portBASE_TYPE xTaskGenericCreate( pdTASK_CODE pvTaskCode, const signed char * const pcName, unsigned short usStackDepth, void *pvParameters, unsigned portBASE_TYPE uxPriority, xTaskHandle *pxCreatedTask, portSTACK_TYPE *puxStackBuffer, const xMemoryRegion * const xRegions ) PRIVILEGED_FUNCTION;
+signed portBASE_TYPE xTaskGenericCreate( pdTASK_CODE pxTaskCode, const signed char * const pcName, unsigned short usStackDepth, void *pvParameters, unsigned portBASE_TYPE uxPriority, xTaskHandle *pxCreatedTask, portSTACK_TYPE *puxStackBuffer, const xMemoryRegion * const xRegions ) PRIVILEGED_FUNCTION;
+
+/*
+ * Get the uxTCBNumber assigned to the task referenced by the xTask parameter.
+ */
+unsigned portBASE_TYPE uxTaskGetTaskNumber( xTaskHandle xTask );
+
+/* 
+ * Set the uxTCBNumber of the task referenced by the xTask parameter to
+ * ucHandle.
+ */
+void vTaskSetTaskNumber( xTaskHandle xTask, unsigned portBASE_TYPE uxHandle );
+
 
 #ifdef __cplusplus
 }

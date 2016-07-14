@@ -1,65 +1,76 @@
 /*
-    FreeRTOS V6.1.0 - Copyright (C) 2010 Real Time Engineers Ltd.
+    FreeRTOS V7.2.0 - Copyright (C) 2012 Real Time Engineers Ltd.
+
 
     ***************************************************************************
-    *                                                                         *
-    * If you are:                                                             *
-    *                                                                         *
-    *    + New to FreeRTOS,                                                   *
-    *    + Wanting to learn FreeRTOS or multitasking in general quickly       *
-    *    + Looking for basic training,                                        *
-    *    + Wanting to improve your FreeRTOS skills and productivity           *
-    *                                                                         *
-    * then take a look at the FreeRTOS books - available as PDF or paperback  *
-    *                                                                         *
-    *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
-    *                  http://www.FreeRTOS.org/Documentation                  *
-    *                                                                         *
-    * A pdf reference manual is also available.  Both are usually delivered   *
-    * to your inbox within 20 minutes to two hours when purchased between 8am *
-    * and 8pm GMT (although please allow up to 24 hours in case of            *
-    * exceptional circumstances).  Thank you for your support!                *
-    *                                                                         *
+     *                                                                       *
+     *    FreeRTOS tutorial books are available in pdf and paperback.        *
+     *    Complete, revised, and edited pdf reference manuals are also       *
+     *    available.                                                         *
+     *                                                                       *
+     *    Purchasing FreeRTOS documentation will not only help you, by       *
+     *    ensuring you get running as quickly as possible and with an        *
+     *    in-depth knowledge of how to use FreeRTOS, it will also help       *
+     *    the FreeRTOS project to continue with its mission of providing     *
+     *    professional grade, cross platform, de facto standard solutions    *
+     *    for microcontrollers - completely free of charge!                  *
+     *                                                                       *
+     *    >>> See http://www.FreeRTOS.org/Documentation for details. <<<     *
+     *                                                                       *
+     *    Thank you for using FreeRTOS, and thank you for your support!      *
+     *                                                                       *
     ***************************************************************************
+
 
     This file is part of the FreeRTOS distribution.
 
     FreeRTOS is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License (version 2) as published by the
     Free Software Foundation AND MODIFIED BY the FreeRTOS exception.
-    ***NOTE*** The exception to the GPL is included to allow you to distribute
-    a combined work that includes FreeRTOS without being obliged to provide the
-    source code for proprietary components outside of the FreeRTOS kernel.
-    FreeRTOS is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-    more details. You should have received a copy of the GNU General Public 
-    License and the FreeRTOS license exception along with FreeRTOS; if not it 
-    can be viewed here: http://www.freertos.org/a00114.html and also obtained 
+    >>>NOTE<<< The modification to the GPL is included to allow you to
+    distribute a combined work that includes FreeRTOS without being obliged to
+    provide the source code for proprietary components outside of the FreeRTOS
+    kernel.  FreeRTOS is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+    more details. You should have received a copy of the GNU General Public
+    License and the FreeRTOS license exception along with FreeRTOS; if not it
+    can be viewed here: http://www.freertos.org/a00114.html and also obtained
     by writing to Richard Barry, contact details for whom are available on the
     FreeRTOS WEB site.
 
     1 tab == 4 spaces!
+    
+    ***************************************************************************
+     *                                                                       *
+     *    Having a problem?  Start by reading the FAQ "My application does   *
+     *    not run, what could be wrong?                                      *
+     *                                                                       *
+     *    http://www.FreeRTOS.org/FAQHelp.html                               *
+     *                                                                       *
+    ***************************************************************************
 
-    http://www.FreeRTOS.org - Documentation, latest information, license and
-    contact details.
+    
+    http://www.FreeRTOS.org - Documentation, training, latest information, 
+    license and contact details.
+    
+    http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
+    including FreeRTOS+Trace - an indispensable productivity tool.
 
-    http://www.SafeRTOS.com - A version that is certified for use in safety
-    critical systems.
-
-    http://www.OpenRTOS.com - Commercial support, development, porting,
-    licensing and training services.
+    Real Time Engineers ltd license FreeRTOS to High Integrity Systems, who sell 
+    the code with commercial support, indemnification, and middleware, under 
+    the OpenRTOS brand: http://www.OpenRTOS.com.  High Integrity Systems also
+    provide a safety engineered and independently SIL3 certified version under 
+    the SafeRTOS brand: http://www.SafeRTOS.com.
 */
-
-#ifndef INC_FREERTOS_H
-	#error "#include FreeRTOS.h" must appear in source files before "#include queue.h"
-#endif
-
-
 
 
 #ifndef QUEUE_H
 #define QUEUE_H
+
+#ifndef INC_FREERTOS_H
+	#error "include FreeRTOS.h" must appear in source files before "include queue.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,7 +79,11 @@ extern "C" {
 
 #include "mpu_wrappers.h"
 
-
+/**
+ * Type by which queues are referenced.  For example, a call to xQueueCreate
+ * returns (via a pointer parameter) an xQueueHandle variable that can then
+ * be used as a parameter to xQueueSend(), xQueueReceive(), etc.
+ */
 typedef void * xQueueHandle;
 
 
@@ -76,6 +91,12 @@ typedef void * xQueueHandle;
 #define	queueSEND_TO_BACK	( 0 )
 #define	queueSEND_TO_FRONT	( 1 )
 
+/* For internal use only.  These definitions *must* match those in queue.c. */
+#define queueQUEUE_TYPE_BASE				( 0U )
+#define queueQUEUE_TYPE_MUTEX 				( 1U )
+#define queueQUEUE_TYPE_COUNTING_SEMAPHORE	( 2U )
+#define queueQUEUE_TYPE_BINARY_SEMAPHORE	( 3U )
+#define queueQUEUE_TYPE_RECURSIVE_MUTEX		( 4U )
 
 /**
  * queue. h
@@ -133,14 +154,14 @@ typedef void * xQueueHandle;
  * \defgroup xQueueCreate xQueueCreate
  * \ingroup QueueManagement
  */
-xQueueHandle xQueueCreate( unsigned portBASE_TYPE uxQueueLength, unsigned portBASE_TYPE uxItemSize );
+#define xQueueCreate( uxQueueLength, uxItemSize ) xQueueGenericCreate( uxQueueLength, uxItemSize, queueQUEUE_TYPE_BASE )
 
 /**
  * queue. h
  * <pre>
  portBASE_TYPE xQueueSendToToFront(
 								   xQueueHandle	xQueue,
-								   const	void	*	pvItemToQueue,
+								   const void	*	pvItemToQueue,
 								   portTickType	xTicksToWait
 							   );
  * </pre>
@@ -215,7 +236,7 @@ xQueueHandle xQueueCreate( unsigned portBASE_TYPE uxQueueLength, unsigned portBA
  * \defgroup xQueueSend xQueueSend
  * \ingroup QueueManagement
  */
-#define xQueueSendToFront( xQueue, pvItemToQueue, xTicksToWait ) xQueueGenericSend( xQueue, pvItemToQueue, xTicksToWait, queueSEND_TO_FRONT )
+#define xQueueSendToFront( xQueue, pvItemToQueue, xTicksToWait ) xQueueGenericSend( ( xQueue ), ( pvItemToQueue ), ( xTicksToWait ), queueSEND_TO_FRONT )
 
 /**
  * queue. h
@@ -297,7 +318,7 @@ xQueueHandle xQueueCreate( unsigned portBASE_TYPE uxQueueLength, unsigned portBA
  * \defgroup xQueueSend xQueueSend
  * \ingroup QueueManagement
  */
-#define xQueueSendToBack( xQueue, pvItemToQueue, xTicksToWait ) xQueueGenericSend( xQueue, pvItemToQueue, xTicksToWait, queueSEND_TO_BACK )
+#define xQueueSendToBack( xQueue, pvItemToQueue, xTicksToWait ) xQueueGenericSend( ( xQueue ), ( pvItemToQueue ), ( xTicksToWait ), queueSEND_TO_BACK )
 
 /**
  * queue. h
@@ -381,7 +402,7 @@ xQueueHandle xQueueCreate( unsigned portBASE_TYPE uxQueueLength, unsigned portBA
  * \defgroup xQueueSend xQueueSend
  * \ingroup QueueManagement
  */
-#define xQueueSend( xQueue, pvItemToQueue, xTicksToWait ) xQueueGenericSend( xQueue, pvItemToQueue, xTicksToWait, queueSEND_TO_BACK )
+#define xQueueSend( xQueue, pvItemToQueue, xTicksToWait ) xQueueGenericSend( ( xQueue ), ( pvItemToQueue ), ( xTicksToWait ), queueSEND_TO_BACK )
 
 
 /**
@@ -469,7 +490,7 @@ xQueueHandle xQueueCreate( unsigned portBASE_TYPE uxQueueLength, unsigned portBA
  * \defgroup xQueueSend xQueueSend
  * \ingroup QueueManagement
  */
-signed portBASE_TYPE xQueueGenericSend( xQueueHandle xQueue, const void * const pvItemToQueue, portTickType xTicksToWait, portBASE_TYPE xCopyPosition );
+signed portBASE_TYPE xQueueGenericSend( xQueueHandle pxQueue, const void * const pvItemToQueue, portTickType xTicksToWait, portBASE_TYPE xCopyPosition );
 
 /**
  * queue. h
@@ -563,7 +584,7 @@ signed portBASE_TYPE xQueueGenericSend( xQueueHandle xQueue, const void * const 
  * \defgroup xQueueReceive xQueueReceive
  * \ingroup QueueManagement
  */
-#define xQueuePeek( xQueue, pvBuffer, xTicksToWait ) xQueueGenericReceive( xQueue, pvBuffer, xTicksToWait, pdTRUE )
+#define xQueuePeek( xQueue, pvBuffer, xTicksToWait ) xQueueGenericReceive( ( xQueue ), ( pvBuffer ), ( xTicksToWait ), pdTRUE )
 
 /**
  * queue. h
@@ -656,7 +677,7 @@ signed portBASE_TYPE xQueueGenericSend( xQueueHandle xQueue, const void * const 
  * \defgroup xQueueReceive xQueueReceive
  * \ingroup QueueManagement
  */
-#define xQueueReceive( xQueue, pvBuffer, xTicksToWait ) xQueueGenericReceive( xQueue, pvBuffer, xTicksToWait, pdFALSE )
+#define xQueueReceive( xQueue, pvBuffer, xTicksToWait ) xQueueGenericReceive( ( xQueue ), ( pvBuffer ), ( xTicksToWait ), pdFALSE )
 
 
 /**
@@ -784,7 +805,7 @@ unsigned portBASE_TYPE uxQueueMessagesWaiting( const xQueueHandle xQueue );
  * \page vQueueDelete vQueueDelete
  * \ingroup QueueManagement
  */
-void vQueueDelete( xQueueHandle xQueue );
+void vQueueDelete( xQueueHandle pxQueue );
 
 /**
  * queue. h
@@ -854,7 +875,7 @@ void vQueueDelete( xQueueHandle xQueue );
  * \defgroup xQueueSendFromISR xQueueSendFromISR
  * \ingroup QueueManagement
  */
-#define xQueueSendToFrontFromISR( pxQueue, pvItemToQueue, pxHigherPriorityTaskWoken ) xQueueGenericSendFromISR( pxQueue, pvItemToQueue, pxHigherPriorityTaskWoken, queueSEND_TO_FRONT )
+#define xQueueSendToFrontFromISR( pxQueue, pvItemToQueue, pxHigherPriorityTaskWoken ) xQueueGenericSendFromISR( ( pxQueue ), ( pvItemToQueue ), ( pxHigherPriorityTaskWoken ), queueSEND_TO_FRONT )
 
 
 /**
@@ -925,7 +946,7 @@ void vQueueDelete( xQueueHandle xQueue );
  * \defgroup xQueueSendFromISR xQueueSendFromISR
  * \ingroup QueueManagement
  */
-#define xQueueSendToBackFromISR( pxQueue, pvItemToQueue, pxHigherPriorityTaskWoken ) xQueueGenericSendFromISR( pxQueue, pvItemToQueue, pxHigherPriorityTaskWoken, queueSEND_TO_BACK )
+#define xQueueSendToBackFromISR( pxQueue, pvItemToQueue, pxHigherPriorityTaskWoken ) xQueueGenericSendFromISR( ( pxQueue ), ( pvItemToQueue ), ( pxHigherPriorityTaskWoken ), queueSEND_TO_BACK )
 
 /**
  * queue. h
@@ -999,7 +1020,7 @@ void vQueueDelete( xQueueHandle xQueue );
  * \defgroup xQueueSendFromISR xQueueSendFromISR
  * \ingroup QueueManagement
  */
-#define xQueueSendFromISR( pxQueue, pvItemToQueue, pxHigherPriorityTaskWoken ) xQueueGenericSendFromISR( pxQueue, pvItemToQueue, pxHigherPriorityTaskWoken, queueSEND_TO_BACK )
+#define xQueueSendFromISR( pxQueue, pvItemToQueue, pxHigherPriorityTaskWoken ) xQueueGenericSendFromISR( ( pxQueue ), ( pvItemToQueue ), ( pxHigherPriorityTaskWoken ), queueSEND_TO_BACK )
 
 /**
  * queue. h
@@ -1166,10 +1187,10 @@ signed portBASE_TYPE xQueueGenericSendFromISR( xQueueHandle pxQueue, const void 
  * \defgroup xQueueReceiveFromISR xQueueReceiveFromISR
  * \ingroup QueueManagement
  */
-signed portBASE_TYPE xQueueReceiveFromISR( xQueueHandle pxQueue, void * const pvBuffer, signed portBASE_TYPE *pxTaskWoken );
+signed portBASE_TYPE xQueueReceiveFromISR( xQueueHandle pxQueue, void * const pvBuffer, signed portBASE_TYPE *pxHigherPriorityTaskWoken );
 
 /*
- * Utilities to query queue that are safe to use from an ISR.  These utilities
+ * Utilities to query queues that are safe to use from an ISR.  These utilities
  * should be used only from witin an ISR, or within a critical section.
  */
 signed portBASE_TYPE xQueueIsQueueEmptyFromISR( const xQueueHandle pxQueue );
@@ -1193,10 +1214,10 @@ unsigned portBASE_TYPE uxQueueMessagesWaitingFromISR( const xQueueHandle pxQueue
  */
 signed portBASE_TYPE xQueueAltGenericSend( xQueueHandle pxQueue, const void * const pvItemToQueue, portTickType xTicksToWait, portBASE_TYPE xCopyPosition );
 signed portBASE_TYPE xQueueAltGenericReceive( xQueueHandle pxQueue, void * const pvBuffer, portTickType xTicksToWait, portBASE_TYPE xJustPeeking );
-#define xQueueAltSendToFront( xQueue, pvItemToQueue, xTicksToWait ) xQueueAltGenericSend( xQueue, pvItemToQueue, xTicksToWait, queueSEND_TO_FRONT )
-#define xQueueAltSendToBack( xQueue, pvItemToQueue, xTicksToWait ) xQueueAltGenericSend( xQueue, pvItemToQueue, xTicksToWait, queueSEND_TO_BACK )
-#define xQueueAltReceive( xQueue, pvBuffer, xTicksToWait ) xQueueAltGenericReceive( xQueue, pvBuffer, xTicksToWait, pdFALSE )
-#define xQueueAltPeek( xQueue, pvBuffer, xTicksToWait ) xQueueAltGenericReceive( xQueue, pvBuffer, xTicksToWait, pdTRUE )
+#define xQueueAltSendToFront( xQueue, pvItemToQueue, xTicksToWait ) xQueueAltGenericSend( ( xQueue ), ( pvItemToQueue ), ( xTicksToWait ), queueSEND_TO_FRONT )
+#define xQueueAltSendToBack( xQueue, pvItemToQueue, xTicksToWait ) xQueueAltGenericSend( ( xQueue ), ( pvItemToQueue ), ( xTicksToWait ), queueSEND_TO_BACK )
+#define xQueueAltReceive( xQueue, pvBuffer, xTicksToWait ) xQueueAltGenericReceive( ( xQueue ), ( pvBuffer ), ( xTicksToWait ), pdFALSE )
+#define xQueueAltPeek( xQueue, pvBuffer, xTicksToWait ) xQueueAltGenericReceive( ( xQueue ), ( pvBuffer ), ( xTicksToWait ), pdTRUE )
 
 /*
  * The functions defined above are for passing data to and from tasks.  The
@@ -1213,18 +1234,28 @@ signed portBASE_TYPE xQueueCRSend( xQueueHandle pxQueue, const void *pvItemToQue
 signed portBASE_TYPE xQueueCRReceive( xQueueHandle pxQueue, void *pvBuffer, portTickType xTicksToWait );
 
 /*
- * For internal use only.  Use xSemaphoreCreateMutex() or
- * xSemaphoreCreateCounting() instead of calling these functions directly.
+ * For internal use only.  Use xSemaphoreCreateMutex(), 
+ * xSemaphoreCreateCounting() or xSemaphoreGetMutexHolder() instead of calling 
+ * these functions directly.
  */
-xQueueHandle xQueueCreateMutex( void );
+xQueueHandle xQueueCreateMutex( unsigned char ucQueueType );
 xQueueHandle xQueueCreateCountingSemaphore( unsigned portBASE_TYPE uxCountValue, unsigned portBASE_TYPE uxInitialCount );
+void* xQueueGetMutexHolder( xQueueHandle xSemaphore );
 
 /*
  * For internal use only.  Use xSemaphoreTakeMutexRecursive() or
  * xSemaphoreGiveMutexRecursive() instead of calling these functions directly.
  */
-portBASE_TYPE xQueueTakeMutexRecursive( xQueueHandle xMutex, portTickType xBlockTime );
-portBASE_TYPE xQueueGiveMutexRecursive( xQueueHandle xMutex );
+portBASE_TYPE xQueueTakeMutexRecursive( xQueueHandle pxMutex, portTickType xBlockTime );
+portBASE_TYPE xQueueGiveMutexRecursive( xQueueHandle pxMutex );
+
+/*
+ * Reset a queue back to its original empty state.  pdPASS is returned if the
+ * queue is successfully reset.  pdFAIL is returned if the queue could not be
+ * reset because there are tasks blocked on the queue waiting to either
+ * receive from the queue or send to the queue.
+ */
+#define xQueueReset( pxQueue ) xQueueGenericReset( pxQueue, pdFALSE )
 
 /*
  * The registry is provided as a means for kernel aware debuggers to
@@ -1246,11 +1277,19 @@ portBASE_TYPE xQueueGiveMutexRecursive( xQueueHandle xMutex );
  * @param pcName The name to be associated with the handle.  This is the
  * name that the kernel aware debugger will display.
  */
-#if configQUEUE_REGISTRY_SIZE > 0
+#if configQUEUE_REGISTRY_SIZE > 0U
 	void vQueueAddToRegistry( xQueueHandle xQueue, signed char *pcName );
 #endif
 
+/*
+ * Generic version of the queue creation function, which is in turn called by 
+ * any queue, semaphore or mutex creation function or macro.
+ */
+xQueueHandle xQueueGenericCreate( unsigned portBASE_TYPE uxQueueLength, unsigned portBASE_TYPE uxItemSize, unsigned char ucQueueType );
 
+/* Not public API functions. */
+void vQueueWaitForMessageRestricted( xQueueHandle pxQueue, portTickType xTicksToWait );
+portBASE_TYPE xQueueGenericReset( xQueueHandle pxQueue, portBASE_TYPE xNewQueue );
 
 
 #ifdef __cplusplus
