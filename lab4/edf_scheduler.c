@@ -35,13 +35,13 @@ static void block_task( struct edf_scheduler_data *edf_scheduler_data, xListItem
 	struct tcb *tcb = ( struct tcb * )_listGET_LIST_ITEM_OWNER( task );
 	vTaskSuspend( tcb->handle );
 
-	// Set the wake up time.
-	tcb->wake_up_time = listGET_LIST_ITEM_VALUE( task );
+	// Set the restart time.
+	tcb->restart_time = listGET_LIST_ITEM_VALUE( task );
 
-	// This task should be prepped to start again after a period of waking up.
+	// This task should be prepped to start again after a period of restarting.
 	// Since the task should start again at this time, it is also the deadline
 	// for the next execution.
-	listSET_LIST_ITEM_VALUE( task, tcb->wake_up_time + tcb->period );
+	listSET_LIST_ITEM_VALUE( task, tcb->restart_time + tcb->period );
 
 	// Reset elapsed time.
 	tcb->elapsed_time = 0;
@@ -168,7 +168,7 @@ static void check_blocked_tasks( struct edf_scheduler_data *edf_scheduler_data )
 	{
 		struct tcb *tcb = ( struct tcb * )_listGET_LIST_ITEM_OWNER( list_item );
 
-		if ( tcb->wake_up_time <= tick_count )
+		if ( tcb->restart_time <= tick_count )
 		{
 			// It is currently task's wake up time, or it has passed.
 			// So put it into the ready list now.
@@ -247,7 +247,7 @@ void initialize_task( struct edf_scheduler_data *edf_scheduler_data, xListItem *
 	tcb->execution_time = execution_time;
 	tcb->period = period;
 	tcb->elapsed_time = 0;
-	tcb->wake_up_time = 0;
+	tcb->restart_time = 0;
 
 	// Initialize the list item before using it.
 	vListInitialiseItem( list_item );

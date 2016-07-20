@@ -33,7 +33,7 @@ struct tcb
 	unsigned int execution_time;
 	unsigned int period;
 	unsigned int elapsed_time;
-	unsigned int wake_up_time;
+	unsigned int restart_time;
 	xTaskHandle handle;
 };
 
