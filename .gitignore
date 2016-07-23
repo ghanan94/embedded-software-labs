@@ -22,3 +22,9 @@
 .#*
 *.uvgui.*
 *.uvopt
+
+
+# Lab4 output
+
+lab4/Output/
+
