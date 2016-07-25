@@ -1,2 +1,2 @@
-# ECE455-Labs
+# Embedded Software Labs
 Embedded Software Labs
